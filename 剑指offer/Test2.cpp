@@ -11,11 +11,11 @@ bool Find(int* arr, size_t rows, size_t cols, int value)
 	// x与右上角的值作为起点开始比较
 	while (x<rows && y>=0)
 	{
-		if (arr[x*cols + y] < value) //当前位置小于x，排除这一行
+		if (arr[x*cols + y] < value) //当前位置小于value，排除这一行
 		{
 			++x;
 		}
-		else if (arr[x*cols + y] > value) //当前位置大于x，排除这一列
+		else if (arr[x*cols + y] > value) //当前位置大于value，排除这一列
 		{
 			--y;
 		}
