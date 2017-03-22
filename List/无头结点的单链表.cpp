@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include<iostream>
+#include<assert.h>
 using namespace std;
 
 //不带头结点的链表(含有指向头结点和尾节点的指针)
@@ -125,6 +126,26 @@ public:
 			delete _head;
 			_head = cur;
 		}
+	}
+
+	Node* Find(const T& x)
+	{
+		Node* cur = _head;
+		while (cur)
+		{
+			if (cur->_data == x)
+			{
+				return cur;
+			}
+			cur = cur->_next;
+		}
+		return (Node*) -1;
+	}
+
+	void Insert(Node* pos, const T& x)
+	{
+		assert(pos);
+
 	}
 
 	void Print()
