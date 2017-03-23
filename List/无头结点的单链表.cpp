@@ -142,10 +142,20 @@ public:
 		return (Node*) -1;
 	}
 
-	void Insert(Node* pos, const T& x)
+	void Insert(Node* pos, const T& x)//posºóÃæ²åÈë
 	{
 		assert(pos);
-
+		Node* tmp = new Node(x);
+		Node* cur = _head;
+		Node* prev = cur;
+		while (cur != pos)
+		{
+			cur=cur->_next;
+			prev = cur;
+		}
+		tmp->_next = cur->_next;
+		prev->_next = tmp;
+		
 	}
 
 	void Print()
@@ -158,6 +168,50 @@ public:
 		}
 		cout << endl;
 	}
+
+	void Erase(Node* pos)
+	{
+		assert(pos);
+		if (_head == pos)
+		{
+			PopFront();
+		}
+		else if (_tail == pos)
+		{
+			PopBack();
+		}
+		else
+		{
+			Node* cur = _head;
+			Node* prev = _head;
+			while (cur != pos)
+			{
+				prev = cur;
+				cur=cur->_next;
+			}
+			prev->_next = cur->_next;
+		}
+	}
+
+
+	void Reverse()                   //ÄæÖÃ  
+	{
+		assert(_head);
+		Node *cur = _head;
+		Node *NewHead = NULL;
+		while (cur)
+		{
+			Node* tmp = cur;tmp->_next = NewHead;
+			NewHead = tmp;
+			if (NewHead == _head)
+			{
+				_tail = NewHead;
+			}
+		}
+		_head = NewHead;
+	}
+	
+
 private:
 	Node* _head;
 	Node* _tail;
@@ -174,10 +228,16 @@ void Test()
 
 	/*t.PopBack();
 	t.Print();*/
-	t.PushFront(0);
+	/*t.PushFront(0);
 	t.Print();
 
 	t.PopFront();
+	t.Print();*/
+	/*t.Insert(t.Find(1), 0);
+	t.Print();
+	t.Erase(t.Find(0));
+	t.Print();*/
+	t.Reverse();
 	t.Print();
 }
 int main()
