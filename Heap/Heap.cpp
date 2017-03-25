@@ -58,6 +58,30 @@ public:
 		_a.pop_back();
 		_AdJustDown(0);
 	}
+
+	size_t Size()
+	{
+		return _a.size();
+	}
+
+	bool Empty()
+	{
+		if (_a.size() == 0)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	void Print()
+	{
+		for (size_t i = 0; i < _a.size(); ++i)
+		{
+			cout << _a[i] << " ";
+		}
+		cout << endl;
+	}
+
 protected:
 	void _AdJustDown(int root)
 	{
@@ -111,8 +135,8 @@ void Test()
 	int a[] = {10, 11, 13, 12, 16, 18, 15, 17, 14, 19 };
 	int n = sizeof(a)/sizeof(a[0]);
 	Heap<int,Less<int>> hp(a, n);
-	hp.Push(25);
-	hp.Pop();
+	cout << hp.Size() << endl;
+	hp.Print();
 }
 int main()
 {
