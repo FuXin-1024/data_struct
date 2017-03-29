@@ -122,7 +122,39 @@ public:
 		FILE* fin = fopen(UncompressFile.c_str(), "w");
 		assert(fin);
 
+		FILE* fout = fopen(filename, "r");
+		assert(fout);
+		//÷ÿΩ®HuffmanTree
+		CharInfo invalid;
+		invalid._count = 0;
+		HuffmanTree<CharInfo> tree(_infos, 256, invalid);
+		HuffmanTreeNode<CharInfo>* root = tree.GetRoot();
+		HuffmanTreeNode<CharInfo>* cur = root;
+		char value = fgetc(fout);
+		LongType count = root->_w._count;
 
+		int pos = 7;
+		int test = 1;
+
+		while (value != EOF)
+		{
+			while (pos >= 0)
+			{
+				if (value && (test << pos))
+					cur->_right;
+				else
+					cur->_left;
+				--pos;
+				if (cur->_left == NULL && cur->_right == NULL)
+				{
+					fputc(cur->_w._ch, fin);
+				}
+				--pos;
+			}
+			value = fgetc(fout);
+		}
+		fclose(fout);
+		fclose(fin);
 	}
 protected:
 	void _GetHuffmanCode(HuffmanTreeNode < CharInfo>* root)
