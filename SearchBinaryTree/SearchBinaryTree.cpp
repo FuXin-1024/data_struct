@@ -70,6 +70,29 @@ public:
 
 	Node* Find(const K& key)
 	{
+		if (_root == NULL)
+			return NULL;
+		Node* cur = _root;
+		while (cur)
+		{
+			if (cur->_key < key)
+			{
+				cur = cur->_right;
+			}
+			else if (cur->_key > key)
+			{
+				cur = cur->_left;
+			}
+			if (cur &&cur->_key == key)
+			{
+				return cur;
+			}
+		}
+		return NULL;
+	}
+
+	bool Remove(const K& key)
+	{
 
 	}
 protected:
@@ -99,7 +122,17 @@ void Test()
 	s.Insert(0);
 	s.Insert(9);
 	s.InOrder();
-
+	cout << s.Find(0)->_key << endl;
+	cout << s.Find(1)->_key << endl;
+	cout << s.Find(2)->_key << endl;
+	cout << s.Find(3)->_key << endl;
+	cout << s.Find(4)->_key << endl;
+	cout << s.Find(5)->_key << endl;
+	cout << s.Find(6)->_key << endl;
+	cout << s.Find(7)->_key << endl;
+	cout << s.Find(8)->_key << endl;
+	cout << s.Find(9)->_key << endl;
+	cout << s.Find(11) << endl;
 }
 int main()
 {
