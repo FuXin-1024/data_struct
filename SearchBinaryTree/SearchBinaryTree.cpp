@@ -93,7 +93,91 @@ public:
 
 	bool Remove(const K& key)
 	{
+		Node* cur = _root;
+		Node* parent = NULL;
+	
+		while (cur)
+		{
+			if (cur->_key < key)
+			{
+				parent = cur;
+				cur = cur->_right;
+			}
+			else if (cur->_key > key)
+			{
+				parent = cur;
+				cur = cur->_left;
+			}
+			else
+			{
+				Node* del = cur;
+				//没有左子树
+				if (cur->_left == NULL)
+				{
+					//没有左树删根节点
+					if (_root->_key == key)
+					{
+						_root = cur->_right;
+						delete del;
+						return true;
+					}
 
+					if (parent->_right == cur)
+					{
+						parent->_right = cur->_right;
+					}
+					else
+					{
+						parent->_left = cur->_right;
+					}
+				}
+				//没有右子树
+				else if (cur->_right == NULL)
+				{
+					//没有右树删根节点
+					if (_root->_key == key)
+					{
+						_root = cur->_left;
+						delete del;
+						return true;
+					}
+					if (parent->_right == cur)
+					{
+						parent->_right = cur->_left;
+					}
+					else
+					{
+						parent->_left = cur->_left;
+					}
+				}
+				//既有左子树又有右子树
+				else
+				{
+					//替换
+					//右树的最左节点或左树的最右节点
+					Node* subRight = cur->_right;
+					Node* subParent = cur; //不能设为空！！！！
+					while (subRight->_left)
+					{
+						subParent = subRight;
+						subRight = subRight->_left;
+					}
+					cur->_key = subRight->_key; //替换
+					del = subRight;
+					if (subParent->_left == subRight)
+					{
+						subParent->_left = subRight->_right;
+					}
+					else
+					{
+						subParent->_right= subRight->_right;
+					}
+				}
+				delete del;
+				return true;
+			}
+		}
+		return false;
 	}
 protected:
 	void _InOrder(Node* root)
@@ -122,17 +206,32 @@ void Test()
 	s.Insert(0);
 	s.Insert(9);
 	s.InOrder();
-	cout << s.Find(0)->_key << endl;
-	cout << s.Find(1)->_key << endl;
-	cout << s.Find(2)->_key << endl;
-	cout << s.Find(3)->_key << endl;
-	cout << s.Find(4)->_key << endl;
-	cout << s.Find(5)->_key << endl;
-	cout << s.Find(6)->_key << endl;
-	cout << s.Find(7)->_key << endl;
-	cout << s.Find(8)->_key << endl;
-	cout << s.Find(9)->_key << endl;
-	cout << s.Find(11) << endl;
+	//cout << s.Find(0)->_key << endl;
+	//cout << s.Find(1)->_key << endl;
+	//cout << s.Find(2)->_key << endl;
+	//cout << s.Find(3)->_key << endl;
+	//cout << s.Find(4)->_key << endl;
+	//cout << s.Find(5)->_key << endl;
+	//cout << s.Find(6)->_key << endl;
+	//cout << s.Find(7)->_key << endl;
+	//cout << s.Find(8)->_key << endl;
+	//cout << s.Find(9)->_key << endl;
+	//cout << s.Find(11) << endl;
+	s.Remove(5);
+	/*s.Remove(0);
+	s.Remove(1);
+	s.Remove(2);
+	s.Remove(3);
+	s.Remove(4);
+    s.Remove(5);
+	
+	s.Remove(6);
+	s.Remove(7);
+	s.Remove(8);
+	s.Remove(9);
+
+	s.Remove(10);*/
+	s.InOrder();
 }
 int main()
 {
