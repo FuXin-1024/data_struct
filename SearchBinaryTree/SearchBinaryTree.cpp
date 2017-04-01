@@ -62,13 +62,17 @@ public:
 		}
 	}
 
+	bool InsertR(const K& key)
+	{
+		return _InsertR(_root, key);
+	}
 	void InOrder()
 	{
 		_InOrder(_root);
 		cout << endl;
 	}
 
-	Node* Find(const K& key)
+	const Node* Find(const K& key)
 	{
 		if (_root == NULL)
 			return NULL;
@@ -83,7 +87,7 @@ public:
 			{
 				cur = cur->_left;
 			}
-			if (cur &&cur->_key == key)
+			else
 			{
 				return cur;
 			}
@@ -91,11 +95,16 @@ public:
 		return NULL;
 	}
 
+	const Node* FindR(const K& key)
+	{
+		return _FindR(_root, key);
+	}
+
 	bool Remove(const K& key)
 	{
 		Node* cur = _root;
 		Node* parent = NULL;
-	
+
 		while (cur)
 		{
 			if (cur->_key < key)
@@ -170,7 +179,7 @@ public:
 					}
 					else
 					{
-						subParent->_right= subRight->_right;
+						subParent->_right = subRight->_right;
 					}
 				}
 				delete del;
@@ -178,6 +187,11 @@ public:
 			}
 		}
 		return false;
+	}
+
+	bool RemoveR(const K& key)
+	{
+		return _RemoveR(_root, key);
 	}
 protected:
 	void _InOrder(Node* root)
@@ -188,6 +202,97 @@ protected:
 		cout << root->_key << " ";
 		_InOrder(root->_right);
 	}
+
+	Node* _FindR(Node* root, const K& key)
+	{
+		if (root == NULL)
+			return NULL;
+		if (root->_key < key)
+		{
+			return _FindR(root->_right, key);
+		}
+		else if (root->_key>key)
+		{
+			return _FindR(root->_left, key);
+		}
+		else
+		{
+			return root;
+		}
+	}
+
+	bool _InsertR(Node*& root, const K& key)
+	{
+		if (root == NULL)
+		{
+			root = new Node(key);
+			return true;
+		}
+
+		if (root->_key < key)
+		{
+			return _InsertR(root->_right, key);
+		}
+		else if (root->_key > key)
+		{
+			return _InsertR(root->_left, key);
+		}
+		else
+		{
+			return false;
+		}
+
+	}
+
+	bool _RemoveR(Node*& root, const K& key)
+	{
+		if (root == NULL)
+		{
+			return false;
+		}
+		if (root->_key < key)
+		{
+			return _RemoveR(root->_right, key);
+		}
+		else if (root->_key > key)
+		{
+			return _RemoveR(root->_left, key);
+		}
+		else
+		{
+			Node* del = root;
+			if (root->_left == NULL)
+			{
+				root = root->_right;
+			}
+			else if (root->_right == NULL)
+			{
+				root = root->_left;
+			}
+			else
+			{
+				Node* parent = root;
+				Node* subRight = root->_right;
+				while (subRight->_left)
+				{
+					parent = subRight;
+					subRight = subRight->_left;
+				}
+				swap(subRight->_key, parent->_key);
+				del = subRight;
+				if (parent->_left == subRight)
+				{
+					parent->_left = subRight->_right;
+				}
+				else
+				{
+					parent->_right = subRight->_right;
+				}
+			}
+			delete del;
+			return true;
+		}
+	}
 private:
 	Node* _root;
 };
@@ -195,16 +300,16 @@ private:
 void Test()
 {
 	SerachBinaryTree<int> s;
-	s.Insert(5);
-	s.Insert(3);
-	s.Insert(4);
-	s.Insert(1);
-	s.Insert(7);
-	s.Insert(8);
-	s.Insert(2);
-	s.Insert(6);
-	s.Insert(0);
-	s.Insert(9);
+	s.InsertR(5);
+	s.InsertR(3);
+	s.InsertR(4);
+	s.InsertR(1);
+	s.InsertR(7);
+	s.InsertR(8);
+	s.InsertR(2);
+	s.InsertR(6);
+	s.InsertR(0);
+	s.InsertR(9);
 	s.InOrder();
 	//cout << s.Find(0)->_key << endl;
 	//cout << s.Find(1)->_key << endl;
@@ -217,20 +322,31 @@ void Test()
 	//cout << s.Find(8)->_key << endl;
 	//cout << s.Find(9)->_key << endl;
 	//cout << s.Find(11) << endl;
-	s.Remove(5);
-	/*s.Remove(0);
+
+	/*cout << s.FindR(0)->_key << endl;
+	cout << s.FindR(1)->_key << endl;
+	cout << s.FindR(2)->_key << endl;
+	cout << s.FindR(3)->_key << endl;
+	cout << s.FindR(4)->_key << endl;
+	cout << s.FindR(5)->_key << endl;
+	cout << s.FindR(6)->_key << endl;
+	cout << s.FindR(7)->_key << endl;
+	cout << s.FindR(8)->_key << endl;
+	cout << s.FindR(9)->_key << endl;
+	cout << s.FindR(11) << endl;*/
+	//s.Remove(5);
+	s.Remove(0);
 	s.Remove(1);
 	s.Remove(2);
 	s.Remove(3);
 	s.Remove(4);
-    s.Remove(5);
-	
-	s.Remove(6);
-	s.Remove(7);
-	s.Remove(8);
-	s.Remove(9);
+	s.Remove(5);
 
-	s.Remove(10);*/
+	//s.Remove(6);
+	//s.Remove(7);
+	//s.Remove(8);
+	//s.Remove(9);
+	//s.Remove(10);
 	s.InOrder();
 }
 int main()
