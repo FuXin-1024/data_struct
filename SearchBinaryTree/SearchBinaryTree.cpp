@@ -23,7 +23,10 @@ public:
 	SerachBinaryTree()
 		:_root(NULL)
 	{}
-
+	~SerachBinaryTree()
+	{
+		_Destroy(_root);
+	}
 	bool Insert(const K& key)
 	{
 		if (_root == NULL)
@@ -293,6 +296,15 @@ protected:
 			return true;
 		}
 	}
+
+void _Destroy(Node* root)
+{
+	if (root == NULL)
+		return;
+	_Destroy(root->_left);
+	_Destroy(root->_right);
+	delete root;
+}
 private:
 	Node* _root;
 };
