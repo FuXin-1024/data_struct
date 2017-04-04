@@ -195,28 +195,54 @@ protected:
 	//×óÓÒË«Ðý
 	void RotateLR(Node* parent)
 	{
+
+		Node* subL = parent->_left;
+		Node* subLR = subL->_right;
+		int bf = subLR->_bf;
 		RotateL(parent->_left);
 		RotateR(parent);
-		if (parent->_left == NULL&&parent->_right == NULL)
+		if (bf == 0)
+		{
+			parent->_bf = subL->_bf = subLR->_bf = 0;
+		}
+		else if (bf == 1)
+		{
 			parent->_bf = 0;
-		else if (parent->_left == NULL&&parent->_right != NULL)
-			parent->_bf = 1;
+			subL->_bf = -1;
+			subLR->_bf = 0;
+		}
 		else
-			parent->_bf = -1;
+		{
+			parent->_bf = 1;
+			subL->_bf = 0;
+			subLR->_bf = 0;
+		}
 	}
 
 	//ÓÒ×óË«Ðý
 	void RotateRL(Node* parent)
 	{
+		Node* subR = parent->_right;
+		Node* subRL = subR->_left;
+		int bf = subRL->_bf;
 		RotateR(parent->_right);
 		RotateL(parent);
-
-		if (parent->_left == NULL&&parent->_right == NULL)
-			parent->_bf = 0;
-		else if (parent->_left == NULL&&parent->_right != NULL)
-			parent->_bf = 1;
-		else
+		if (bf == 0)
+		{
+			parent->_bf = subR->_bf = subRL->_bf = 0;
+		}
+		else if (bf == 1)
+		{
 			parent->_bf = -1;
+			subR->_bf = 0;
+			subRL->_bf = 0;
+		}
+		else //  -1
+		{
+			parent->_bf = 0;
+			subR->_bf = 1;
+			subRL->_bf = 0;
+		}
 	}
 
 	void _InOrder(Node* root)
