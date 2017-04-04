@@ -123,7 +123,9 @@ public:
 
 	bool IsBalance()
 	{
-		return _IsBalance(_root);
+		/*return _IsBalance(_root);*/
+		int height = 0;
+		return _IsBalance(_root, height);
 	}
 protected:
 	//ÓÒµ¥Ðý
@@ -154,10 +156,6 @@ protected:
 		
 		 subL->_bf = 0;
 		 parent->_bf = 0;
-		 /*if (parent->_left == NULL)
-			 parent->_bf = 1;
-		 else
-			 parent->_bf = 0;*/
 	}
 
 	//×óµ¥Ðý
@@ -186,10 +184,6 @@ protected:
 		}
 		subR->_parent = ppNode;
 		parent->_bf = subR->_bf = 0;
-		/*if (parent->_right == NULL)
-			parent->_bf = -1;
-		else
-			parent->_bf = 0;*/
 	}
 
 	//×óÓÒË«Ðý
@@ -262,7 +256,8 @@ protected:
 		int r = _Height(root->_right);
 		return l > r ? l + 1 : r + 1;
 	}
-	bool _IsBalance(Node* root)
+
+	bool _IsBalance(Node* root) //O(n^2)
 	{
 		if (root == NULL)
 			return true;
@@ -276,6 +271,31 @@ protected:
 		return (abs(r-l) < 2 )&& _IsBalance(root->_left) && _IsBalance(root->_right);
 	}
 
+	bool _IsBalance(Node* root, int& height) //O(n)
+	{
+		if (root == NULL)
+		{
+			height = 0;
+			return true;
+		}
+		int left= 0, right= 0;
+		if (_IsBalance(root->_left, left)
+			&& _IsBalance(root->_right, right)
+			&& abs(right - left) < 2)
+		{
+			if (root->_bf != right - left)
+			{
+				cout << "Æ½ºâÒò×ÓÒì³£" << root->_key << endl;
+				return false;
+			}
+			height = left>right ? left + 1 : right + 1;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 	void _Destroy(Node* root)
 	{
 		if (root == NULL)
