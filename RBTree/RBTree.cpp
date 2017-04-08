@@ -36,7 +36,9 @@ public:
 	{}
 
 	~RBTree()
-	{}
+	{
+		_destroy(_root);
+	}
 
 	bool Insert(const K& key, const V& value)
 	{
@@ -59,7 +61,7 @@ public:
 			else if (cur->_key > key)
 			{
 				parent = cur;
-				cur = cur->_key;
+				cur = cur->_left;
 			}
 			else
 			{
@@ -100,6 +102,7 @@ public:
 					if (cur == parent->_right)
 					{
 						RotateL(parent);
+						swap(parent, cur);
 					}
 					RotateR(grandfather);
 					parent->_color = BLACK;
@@ -125,6 +128,7 @@ public:
 					if (cur == parent->_left)
 					{
 						RotateR(parent);
+						swap(parent, cur);
 					}
 					RotateL(grandfather);
 					parent->_color = BLACK;
@@ -144,7 +148,7 @@ public:
 		parent->_left = subLR;
 		if (subLR)
 			subLR->_parent = parent;
-		Node* ppNode = parent;
+		Node* ppNode = parent->_parent;
 		subL->_right = parent;
 		parent->_parent = subL;
 		if (ppNode == NULL)
@@ -164,12 +168,12 @@ public:
 		void RotateL(Node* parent)
 		{
 			Node* subR = parent->_right;
-			Node* subRL = subL->_left;
+			Node* subRL = subR->_left;
 			parent->_right = subRL;
 			if (subRL)
 				subRL->_parent = parent;
-			Node* ppNode = parent;
-			subL->_left = parent;
+			subR->_left = parent;
+			Node* ppNode = parent->_parent;
 			parent->_parent = subR;
 			if (ppNode == NULL)
 			{
@@ -179,10 +183,10 @@ public:
 			else
 			{
 				if (ppNode->_left == parent)
-					ppNode->_left = subL;
+					ppNode->_left = subR;
 				else
-					ppNode->_right = subL;
-				subL->_parent = ppNode;
+					ppNode->_right = subR;
+				subR->_parent = ppNode;
 			}
 	}
 		void InOrder()
@@ -209,6 +213,14 @@ public:
 			return _IsBalance(_root, blackNum, num);
 		}
 protected:
+	void _destroy(Node* root)
+	{
+		if (root == NULL)
+			return;
+		_destroy(root->_left);
+		_destroy(root->_right);
+		delete root;
+	}
 	void _InOrder(Node* root)
 	{
 		if (root == NULL)
@@ -224,7 +236,7 @@ protected:
 		{
 			if (num != blackNum)
 			{
-				cout << "Òì³£" << root->_key << endl;
+				cout << "Òì³£" << endl;
 				return false;
 			}
 			else
@@ -245,10 +257,18 @@ protected:
 };
 void Test()
 {
-	RBTree<int, int> t;
+	RBTree<int, int> t1;
+	int a[] = { 16, 3, 7, 11, 9, 26, 18, 14, 15, 9, 3 };
+	for (size_t i = 0; i < sizeof(a) / sizeof(a[0]); ++i)
+	{
+		t1.Insert(a[i], i);
+	}
+	t1.InOrder();
+	cout << t1.IsBlance() << endl;
 }
 int main()
 {
+	Test();
 	system("pause");
 	return 0;
 }
