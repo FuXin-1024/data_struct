@@ -7,13 +7,14 @@ using namespace std;
 typedef long long LongType;
 struct CharInfo
 {
-	char _ch;//字符
+	unsigned char _ch;//字符
 	LongType _count;//字符出现的次数
 	string _code;// h
 
 	CharInfo(LongType count = 0)
 		:_count(count)
 		, _ch(0)
+		, _code("")
 	{}
 
 	bool operator!=(const CharInfo& info)const
@@ -34,7 +35,7 @@ struct CharInfo
 
 struct CountInfo
 {
-	char _ch;
+	unsigned char _ch;
 	LongType _count;
 };
 class FileCompress
@@ -52,13 +53,13 @@ public:
 		assert(filename);
 
 		//统计字符出现的次数
-		FILE* fout = fopen(filename, "r");
+		FILE* fout = fopen(filename, "rb");
 		assert(fout);
 
-		char ch = fgetc(fout);
+		int ch = fgetc(fout);
 		while (ch != EOF)
 		{
-			_infos[ch]._count++;
+			_infos[(unsigned char)ch]._count++;
 			ch = fgetc(fout);
 		}
 		//构建HuffmanTree
@@ -72,14 +73,26 @@ public:
 		//压缩
 		string CompressFile = filename;
 		CompressFile += ".huffman";
-		FILE* fin = fopen(CompressFile.c_str(), "w");//c_str() 将string 转化成const char * 
+		FILE* fin = fopen(CompressFile.c_str(), "wb");//c_str() 将string 转化成const char * 
 		assert(fin);
 
 		//配置信息(子符出现的次数->重建HuffmanTree
-	
+		CountInfo info;
+		for (size_t i = 0; i < 256; i++)
+		{
+			if (_infos[i]._count)  //存储出现过的字符信息；
+			{
+				info._ch = _infos[i]._ch;
+				info._count = _infos[i]._count;
 
+				fwrite(&info, sizeof(info), 1, fin);
+			}
+		}
+		//结尾的标记
+		info._count = -1;
+		fwrite(&info, sizeof(info), 1, fin);
 		fseek(fout, 0, SEEK_SET);// 定位到文件头
-		ch = getc(fout);
+		ch = fgetc(fout);
 		char value = 0; 
 		int pos = 0;
 		while (ch != EOF)
@@ -117,44 +130,58 @@ public:
 		string UncompressFile = filename;
 		size_t index = UncompressFile.rfind('.');
 		assert(index != string::npos);
+
 		UncompressFile = UncompressFile.substr(0, index);
 		//还原文件
-		FILE* fin = fopen(UncompressFile.c_str(), "w");
+		FILE* fin = fopen(UncompressFile.c_str(), "wb");
 		assert(fin);
 
-		FILE* fout = fopen(filename, "r");
+		FILE* fout = fopen(filename, "rb");
 		assert(fout);
-		//重建HuffmanTree
-		CharInfo invalid;
-		invalid._count = 0;
-		HuffmanTree<CharInfo> tree(_infos, 256, invalid);
+		CharInfo invalue;
+		invalue._count = 0;
+		CountInfo info;
+		while (1)
+		{
+			fread(&info, sizeof(CountInfo), 1, fout);
+			if (info._count == -1)
+				break;
+			_infos[info._ch]._ch = info._ch;
+			_infos[info._ch]._count = info._count;
+		}
+		HuffmanTree<CharInfo> tree(_infos, 256, invalue);
 		HuffmanTreeNode<CharInfo>* root = tree.GetRoot();
-		HuffmanTreeNode<CharInfo>* cur = root;
-		char value = fgetc(fout);
-		LongType count = root->_w._count;
-
 		int pos = 7;
 		int test = 1;
-
-		while (value != EOF)
+		char value = fgetc(fout);
+		LongType  count = root->_w._count;
+		HuffmanTreeNode<CharInfo>*  cur = root;
+		while (value != EOF || count != 0)
 		{
 			while (pos >= 0)
 			{
-				if (value && (test << pos))
-					cur->_right;
+				if (value& (test << pos))
+
+					cur = cur->_right;
 				else
-					cur->_left;
+					cur = cur->_left;
 				--pos;
-				if (cur->_left == NULL && cur->_right == NULL)
+				if (cur->_left == NULL&& cur->_right == NULL)
 				{
 					fputc(cur->_w._ch, fin);
+					cur = root;
+					count--;
+					if (count == 0)
+					{
+						break;
+					}
 				}
-				--pos;
 			}
+			pos = 7;
 			value = fgetc(fout);
 		}
-		fclose(fout);
 		fclose(fin);
+		fclose(fout);
 	}
 protected:
 	void _GetHuffmanCode(HuffmanTreeNode < CharInfo>* root)
@@ -166,7 +193,7 @@ protected:
 		{
 			HuffmanTreeNode<CharInfo>* cur;
 			HuffmanTreeNode<CharInfo>* parent;
-			string& code = _infos[root->_w._ch]._code;
+			string& code = _infos[(unsigned)root->_w._ch]._code;
 			cur = root;
 			parent = cur->_parent;
 			
