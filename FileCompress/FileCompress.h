@@ -150,6 +150,28 @@ public:
 			_infos[info._ch]._count = info._count;
 		}
 		HuffmanTree<CharInfo> tree(_infos, 256, invalue);
+
+		//处理只有一个字符或者文本只有一个字符并且重复多次出现
+		if (tree.GetSize() == 1)
+		{
+			char ch;
+			int count = 0;
+			for (int i = 0; i < 256; i++)
+			{
+				if (_infos[i] != invalue)
+				{
+					ch = _infos[i]._ch;
+					count = _infos[i]._count;
+				}
+			}
+			while (count > 0)
+			{
+				fputc(ch, fin);
+				count--;
+			}
+			return;
+		}
+
 		HuffmanTreeNode<CharInfo>* root = tree.GetRoot();
 		int pos = 7;
 		int test = 1;
