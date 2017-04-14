@@ -73,7 +73,17 @@ public:
 		_Destory(_root);
 	}
 
+	Node* GetRoot()
+	{
+		return _root;
+	}
 
+	size_t GetSize()
+	{
+		size_t len = 0;
+		_Size(_root, len);
+		return len;
+	}
 
 protected:
 	//·À¿½±´
@@ -90,6 +100,20 @@ protected:
 
 		delete root;
 	}
+
+	void _Size(Node *root, size_t &len)
+	{
+		if (root == NULL)
+		{
+			return;
+		}
+
+
+		_Size(root->_left, len);
+		_Size(root->_right, len);
+		len++;
+	}
+
 private:
 	Node* _root;
 };
