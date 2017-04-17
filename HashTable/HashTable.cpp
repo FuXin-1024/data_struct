@@ -50,11 +50,9 @@ namespace first
 		pair<K, V> _kv;
 		State _s;
 
-		//HashNode(const pair<K, V>& kv)
-		//	:_kv(kv)
-		//	, _s(EMPTY)
-		//{}
-
+		HashNode()
+			: _s(EMPTY)
+		{}	
 	};
 
 	template <class K, class V, class HashFunc = __HashFunc<K>>
@@ -103,7 +101,7 @@ namespace first
 						return NULL;
 				}
 				index += 1;
-				if (index = _tables.size())
+				if (index == _tables.size())
 					index = 0;
 			}
 			return NULL;
@@ -126,6 +124,7 @@ namespace first
 			return ((ret.first)->_kv).second;
 		}
 	protected:
+
 		size_t _HashFunc(const K& key)
 		{
 			//return key % _tables.size();
@@ -142,7 +141,7 @@ namespace first
 		{
 			if (_tables.size() == 0)
 			{
-				_tables.resize(10);
+				_tables.resize(53);
 			}
 			else if (_size * 10 / _tables.size() == 7)
 			{
@@ -192,21 +191,33 @@ namespace first
 //¿ªÁ´·¨
 namespace second
 {
-	template<class K>
-	struct __HashFunc
+	template <class K,class V>
+	struct HashNode
+	{
+		pair<K, V> _kv;
+		HashNode<K, V>* _next;
+	
+		HashNode(const pair<K,V>& kv)
+			:_kv(kv)
+			, _next(NULL)
+		{}
+	};
+	template <class K>
+	struct _HashFunc
 	{
 		size_t operator()(const K& key)
 		{
 			return key;
 		}
 	};
+	
 	//ÌØ»¯
 	template<>
-	struct __HashFunc<string>
+	struct _HashFunc<string>
 	{
-		size_t operator()(const string& k)
+		size_t operator()(const string& key)
 		{
-			return BKDRHash(k.c_str());
+			return BKDRHash(key.c_str());
 		}
 	protected:
 		//×Ö·û´®¹þÏ£´¦ÀíËã·¨
@@ -221,134 +232,141 @@ namespace second
 			return(hash & 0x7FFFFFFF);
 		}
 	};
-
-	template <class K,class V>
-	struct HashNode
-	{
-		pair<K, V> _kv;
-		HashNode<K, V>* _next;
-
-		HashNode(const pair<K, V>& kv)
-			:_kv(kv)
-			, _next(NULL)
-		{}
-	};
-
-	template<class K,class V,class __HashFunc=__HashFunc<K>>
-	class HashTable
+	template<class K,class V,class HashFunc=_HashFunc<K>>
+	class HashTableBucket
 	{
 		typedef HashNode<K, V> Node;
 	public:
-		HashTable()
+		HashTableBucket()
 			:_size(0)
 		{}
-
-		HashTable(size_t n)
+	
+		HashTableBucket(const size_t n)
 			:_size(0)
 		{
 			_tables.resize(n);
 		}
-		pair<Node*, bool> Insert(const pair<K, V>& kv)
+	
+		~HashTableBucket()
+		{
+			_Clear();
+			_size = 0;
+		}
+	
+		V& operator[](const K& key)
+		{
+			pair<Node* ,bool> ret = Insert(make_pair(key, V()));
+			return ((ret.first)->_kv).second;
+		}
+	
+		pair<Node*,bool> Insert(const pair<K, V>& kv)
 		{
 			_Check();
-			size_t index = _HashFunc(kv.first, _tables.size());
-			//¼ì²éÊÇ·ñ´æÔÚ
+			size_t index = _HashFunc(kv.first);
 			Node* cur = _tables[index];
+			
 			while (cur)
 			{
-				if ((cur->_kv).first == kv.first)
+				if (cur->_kv.first == kv.first)
 				{
-					return make_pair(_tables[index], false);
+					return make_pair(cur, false);
 				}
 				cur = cur->_next;
 			}
 			//Í·²å
-			Node* tmp = new Node(kv);
-			tmp->_next = _tables[index];
-			_tables[index] = tmp;
+			Node* newNode = new Node(kv);
+			newNode->_next = _tables[index];
+			_tables[index] = newNode;
 			++_size;
 			return make_pair(_tables[index], true);
 		}
-
+	
 		Node* Find(const K& key)
 		{
-			size_t index = _HashFunc(key, _tables.size());
+			size_t index = _HashFunc(key);
 			Node* cur = _tables[index];
 			while (cur)
 			{
 				if (cur->_kv.first == key)
-				{
 					return cur;
-				}
 				cur = cur->_next;
 			}
-			return NULL;
+			return false;
 		}
-
+	
 		bool Remove(const K& key)
 		{
-			size_t index = _HashFunc(key, _tables.size());
+			size_t index = _HashFunc(key);
 			Node* cur = _tables[index];
 			Node* parent = NULL;
-
 			if (cur == NULL)
 				return false;
 			while (cur)
 			{
-				if (cur->_next == NULL)
+				if (cur->_kv.first == key)
 				{
-					delete cur;
-					--_size;
-					return  true;
-				}
-				else if (cur->_kv.first == key)
-				{
-					parent->_next = cur->_next;
+					if (cur == _tables[index])
+					{
+						_tables[index] = cur->_next;
+					}
+					else
+					{
+						parent->_next = cur->_next;
+					}
 					delete cur;
 					cur = NULL;
 					--_size;
-					return  true;
+					break;
 				}
-
 				parent = cur;
 				cur = cur->_next;
 			}
 			return false;
+		}
+		void Print()
+		{
+			for (size_t i = 0; i < _tables.size(); ++i)
+			{
+				Node* cur = _tables[i];
+				while (cur)
+				{
+					cout << cur->_kv.first << " ";
+					cur = cur->_next;
+				}
+			}
+			cout << endl;
 		}
 	protected:
 		void _Check()
 		{
 			if (_tables.size() == 0 || _size / _tables.size() >= 1)
 			{
-				vector<Node*> newTable;
-				newTable.resize(GetPrimenum(_tables.size()));
-
+				size_t newSize = _GetPrimenum(_tables.size());
+				HashTableBucket<K, V, HashFunc> newTable(newSize);
 				for (size_t i = 0; i < _tables.size(); ++i)
 				{
 					Node* cur = _tables[i];
 					while (cur)
 					{
-						Node* next = cur->_next;
-						_tables[i] = next;
-						size_t index = _HashFunc((cur->_kv).first, newTable.size());
-
-						Node* tmp = newTable[index];
-						newTable[index] = cur;
-						cur->_next = tmp;
-
-						cur = next;
+						newTable.Insert(make_pair(((cur->_kv).first), ((cur->_kv).second)));
+						cur = cur->_next;
 					}
 				}
-				_tables.swap(newTable);
+				_Swap(newTable);
 			}
 		}
-		size_t _HashFunc(const K& key,const size_t& size)
+	
+		void _Swap(HashTableBucket<K,V,HashFunc>& ht)
 		{
-			//return key % _tables.size();
-			__HashFunc hf;
-			return hf(key) % size;
+			swap(_size, ht._size);
+			_tables.swap(ht._tables);
 		}
-		size_t GetPrimenum(const size_t& sz)
+		size_t _HashFunc(const K& key)
+		{
+			HashFunc hf;
+			return hf(key) % _tables.size();
+		}
+		size_t _GetPrimenum(const size_t& sz)
 		{
 			const int Primesize = 28;
 			static const unsigned long Primenum[Primesize] =
@@ -372,18 +390,32 @@ namespace second
 			}
 			return sz;
 		}
+		void _Clear()
+		{
+			for (size_t i = 0; i < _tables.size(); ++i)
+			{
+				Node* cur = _tables[i];
+				while (cur)
+				{
+					Node* del = cur;
+					cur = cur->_next;
+					delete del;
+				}
+				_tables[i] = NULL;
+			}
+		}
 	protected:
 		vector<Node*> _tables;
 		size_t _size;
 	};
 }
-void Test()
+void TestFirst()
 {
-	/*int a[] = { 89, 18, 49, 58, 9 };
+	int a[] = { 89, 18, 49, 58, 9 };
 	first::HashTable<int, int> ht;
 	for (size_t i = 0; i < sizeof(a) / sizeof(a[0]); ++i)
 	{
-		ht.Insert(make_pair(a[i], i));
+	ht.Insert(make_pair(a[i], i));
 	}
 	ht.Insert(make_pair(10, 1));
 	ht.Insert(make_pair(11, 1));
@@ -394,9 +426,13 @@ void Test()
 	first::HashTable<string, string, first::__HashFunc<string>> ht1;
 	ht1.Insert(make_pair("Left", "×ó±ß"));
 	ht1.Insert(make_pair("Left", "Ê£Óà"));
-	ht1["Left"]="Ê£Óà";*/
+	ht1["Left"]="Ê£Óà";
+}
+void TestSecond()
+{
+	
 	int a[] = { 89, 18, 49, 58, 9 };
-	second::HashTable<int, int> ht;
+	second::HashTableBucket<int, int> ht;
 	for (size_t i = 0; i < sizeof(a) / sizeof(a[0]); ++i)
 	{
 		ht.Insert(make_pair(a[i], i));
@@ -409,21 +445,21 @@ void Test()
 	ht.Insert(make_pair(56, 1));
 	ht.Insert(make_pair(106, 1));
 	ht.Insert(make_pair(212, 1));
-
+	ht.Print();
 	ht.Remove(106);
-	/*ht.Insert(make_pair(11, 1));
-	ht.Insert(make_pair(12, 1));
-	ht.Insert(make_pair(13, 1));
-	ht.Insert(make_pair(14, 1));*/
+	ht.Print();
 	//
-	/*second::HashTable<string, string, second::__HashFunc<string>> ht1;
+	second::HashTableBucket<string, string, second::_HashFunc<string>> ht1;
 	ht1.Insert(make_pair("Left", "×ó±ß"));
-	ht1.Insert(make_pair("Left", "Ê£Óà"));*/
-	//ht1["Left"] = "Ê£Óà";
+	ht1.Insert(make_pair("Left", "Ê£Óà"));
+	ht1.Print();
+	ht1["Left"] = "Ê£Óà";
+	ht1.Print();
 }
 int main()
 {
-	Test();
+	//TestFirst();
+	TestSecond();
 	system("pause");
 	return 0;
 }
