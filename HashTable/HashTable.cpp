@@ -568,7 +568,7 @@ void TestSecond()
 
 	ht.Print();
 	
-	second::HashTableBucket<int, int>::Iterator it = ht.Begin();
+	second::HashTableBucket<int,int>::Iterator it = ht.Begin();
 	while (it != ht.End())
 	{
 		cout << it->first << " ";
