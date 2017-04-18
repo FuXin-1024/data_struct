@@ -232,11 +232,83 @@ namespace second
 			return(hash & 0x7FFFFFFF);
 		}
 	};
+
+	//ษ๙ร๗
+	template<class K, class V, class HashFunc>
+	class HashTableBucket;
+
+	template<class K,class V,class HashFunc,class ValueTypePtr,class ValueTypeRef>
+	struct __HashTableIterator
+	{
+		typedef HashNode<K, V> Node;
+		typedef __HashTableIterator<K, V, HashFunc, ValueTypePtr, ValueTypeRef> Self;
+		typedef pair<K, V> ValueType;
+		Node* _node;
+		HashTableBucket<K, V,HashFunc>* _ht;
+
+		__HashTableIterator(Node* node, HashTableBucket<K, V, HashFunc>* ht)
+			:_node(node)
+			, _ht(ht)
+		{}
+
+		ValueType operator*()
+		{
+			return _node->_kv;
+		}
+
+		ValueType operator->()
+		{
+			return &(operator*());
+		}
+
+		bool operator!=(const Self& s)const
+		{
+			return _node != s._node;
+		}
+		bool operator==(const Self& s)const
+		{
+			return _node == s._node;
+		}
+
+		Self&  operator++()
+		{
+			_node = _Next(_node);
+			return *this;
+		}
+
+	protected:
+		Node* _Next(Node* node)
+		{
+			Node* next = node->_next;
+			if (next)
+			{
+				return next;
+			}
+			else
+			{
+				size_t index = _ht->_HashFunc(_node->_kv.first) + 1;
+				for (; index < (_ht->_tables.size()); ++index)
+				{
+					next = _ht->_tables[index];
+					if (next)
+						return next;
+				}
+			}
+			return NULL;
+		}
+	};
+
 	template<class K,class V,class HashFunc=_HashFunc<K>>
 	class HashTableBucket
 	{
 		typedef HashNode<K, V> Node;
+		friend struct __HashTableIterator<K, V, HashFunc, pair<K, V>*, pair<K, V>&>;
+		
 	public:
+		typedef __HashTableIterator<K, V, HashFunc, pair<K, V>*, pair<K, V>&> Iterator;
+		typedef __HashTableIterator<K, V, HashFunc, const pair<K, V>*, const pair<K, V>&> ConstIterator;
+		friend Iterator;
+		friend  ConstIterator;
 		HashTableBucket()
 			:_size(0)
 		{}
@@ -336,6 +408,43 @@ namespace second
 			}
 			cout << endl;
 		}
+
+		Iterator Begin()
+		{
+			for (size_t i = 0; i < _tables.size(); ++i)
+			{
+				Node* cur = _tables[i];
+				if (cur)
+				{
+					return Iterator(cur, this);
+				}
+			}
+			return Iterator(NULL,this);
+		}
+
+		ConstIterator CBegin()const
+		{
+			for (size_t i = 0; i < _tables.size(); ++i)
+			{
+				Node* cur = _tables[i];
+				if (cur)
+				{
+					return Iterator(cur, this);
+				}
+			}
+			return Iterator(NULL, this);
+		}
+
+		Iterator End()
+		{
+			return Iterator(NULL, this);
+		}
+
+		ConstIterator CEnd() const
+		{
+			return Iterator(NULL, this);
+		}
+
 	protected:
 		void _Check()
 		{
@@ -428,6 +537,17 @@ void TestFirst()
 	ht1.Insert(make_pair("Left", "สฃำเ"));
 	ht1["Left"]="สฃำเ";
 }
+
+//void PrintSecond(second::HashTableBucket<int, int>& ht)
+//{
+//	second::HashTableBucket<int, int>::Iterator it = ht.Begin();
+//	while (it != ht.End())
+//	{
+//		cout << it->first << " ";
+//		++it;
+//	}
+//	cout << endl;
+//}
 void TestSecond()
 {
 	
@@ -445,16 +565,28 @@ void TestSecond()
 	ht.Insert(make_pair(56, 1));
 	ht.Insert(make_pair(106, 1));
 	ht.Insert(make_pair(212, 1));
+
 	ht.Print();
-	ht.Remove(106);
-	ht.Print();
+	
+	second::HashTableBucket<int, int>::Iterator it = ht.Begin();
+	while (it != ht.End())
+	{
+		cout << it->first << " ";
+		++it;
+	}
+	cout << endl;
+
+
+	//PrintSecond(ht);
+	/*ht.Remove(106);
+	ht.Print();*/
 	//
 	second::HashTableBucket<string, string, second::_HashFunc<string>> ht1;
 	ht1.Insert(make_pair("Left", "ื๓ฑ฿"));
 	ht1.Insert(make_pair("Left", "สฃำเ"));
-	ht1.Print();
+	//ht1.Print();
 	ht1["Left"] = "สฃำเ";
-	ht1.Print();
+	//ht1.Print();
 }
 int main()
 {
