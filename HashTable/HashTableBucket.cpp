@@ -43,10 +43,78 @@ protected:
 		return(hash & 0x7FFFFFFF);
 	}
 };
+
+//ÉùÃ÷
+template<class K, class V, class HashFunc>
+class HashTableBucket;
+
+template<class K, class V, class HashFunc, class ValueTypePtr, class ValueTypeRef>
+struct __HashTableIterator
+{
+	typedef HashNode<K, V> Node;
+	typedef __HashTableIterator< K,  V,  HashFunc,  ValueTypePtr,  ValueTypeRef> Self;
+
+	Node* _node;
+	HashTableBucket<K, V, HashFunc>* _ht;
+
+	__HashTableIterator(Node* node, HashTableBucket<K, V, HashFunc>* ht)
+		:_node(node)
+		, _ht(ht)
+	{}
+
+	ValueTypeRef operator*()
+	{
+		return _node->_kv;
+	}
+
+	ValueTypePtr operator->()
+	{
+		return &(operator*());
+	}
+
+	bool operator == (const Self& s)const
+	{
+		return _node == s._node;
+	}
+
+	bool operator !=(const Self& s)const
+	{
+		return _node != s._node;
+	}
+
+	Self& operator++()
+	{
+		_node = _Next(_node);
+		return *this;
+	}
+
+protected:
+	Node* _Next(Node* node)
+	{
+		Node* next = node->_next;
+		if (next)
+			return next;
+		else
+		{
+			size_t index = _ht->_HashFunc(node->_kv.first) + 1;
+			for (; index < _ht->_tables.size(); ++index)
+			{
+				next = _ht->_tables[index];
+				if (next)
+					return next;
+			}
+		}
+		return NULL;
+	}
+};
+
 template<class K,class V,class HashFunc=_HashFunc<K>>
 class HashTableBucket
 {
+public:
 	typedef HashNode<K, V> Node;
+	typedef __HashTableIterator<K, V, HashFunc, pair<K, V>*, pair<K, V>&> Iterator;
+	friend Iterator;
 public:
 	HashTableBucket()
 		:_size(0)
@@ -147,6 +215,23 @@ public:
 		}
 		cout << endl;
 	}
+
+	Iterator Begin()
+	{
+		for (size_t i = 0; i < _tables.size(); ++i)
+		{
+			Node* cur = _tables[i];
+			if (cur)
+				return Iterator(cur, this);
+		}
+		return Iterator(NULL, this);
+	}
+
+	Iterator End()
+	{
+		return Iterator(NULL, this);
+	}
+
 protected:
 	void _Check()
 	{
@@ -236,6 +321,15 @@ void TestHashTableBucket()
 	ht.Insert(make_pair(106, 1));
 	ht.Insert(make_pair(212, 1));
 	ht.Print();
+
+	HashTableBucket<int, int, _HashFunc<int>>::Iterator it = ht.Begin();
+	while (it != ht.End())
+	{
+	cout << it->first << " ";
+	++it;
+	}
+	cout << endl;
+
 	ht.Remove(53);
 	ht.Remove(212);
 	ht.Remove(106);
