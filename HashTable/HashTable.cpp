@@ -251,12 +251,12 @@ namespace second
 			, _ht(ht)
 		{}
 
-		ValueType operator*()
+		ValueTypeRef operator*()
 		{
 			return _node->_kv;
 		}
 
-		ValueType operator->()
+		ValueTypePtr operator->()
 		{
 			return &(operator*());
 		}
@@ -538,16 +538,16 @@ void TestFirst()
 	ht1["Left"]="Ê£Óà";
 }
 
-//void PrintSecond(second::HashTableBucket<int, int>& ht)
-//{
-//	second::HashTableBucket<int, int>::Iterator it = ht.Begin();
-//	while (it != ht.End())
-//	{
-//		cout << it->first << " ";
-//		++it;
-//	}
-//	cout << endl;
-//}
+void PrintSecond(second::HashTableBucket<int, int>& ht)
+{
+	second::HashTableBucket<int, int>::Iterator it = ht.Begin();
+	while (it != ht.End())
+	{
+		cout << it->first << " ";
+		++it;
+	}
+	cout << endl;
+}
 void TestSecond()
 {
 	
@@ -567,19 +567,17 @@ void TestSecond()
 	ht.Insert(make_pair(212, 1));
 
 	ht.Print();
-	
-	second::HashTableBucket<int,int>::Iterator it = ht.Begin();
+	PrintSecond(ht);
+	/*second::HashTableBucket<int,int>::Iterator it = ht.Begin();
 	while (it != ht.End())
 	{
 		cout << it->first << " ";
 		++it;
 	}
-	cout << endl;
+	cout << endl;*/
 
-
-	//PrintSecond(ht);
-	/*ht.Remove(106);
-	ht.Print();*/
+	ht.Remove(106);
+	PrintSecond(ht);
 	//
 	second::HashTableBucket<string, string, second::_HashFunc<string>> ht1;
 	ht1.Insert(make_pair("Left", "×ó±ß"));
