@@ -26,6 +26,32 @@ public:
 		:_root(NULL)
 	{}
 
+	~BinaryTree()
+	{
+		_Destroy(_root);
+	}
+
+	BinaryTree(const BinaryTree<T>& t)
+	{
+		_root = _Copy(t._root);
+	}
+
+	/*BinaryTree<T>& operator=(const BinaryTree<T>& t)
+	{
+		if (this != &t)
+		{
+			Node* newNode = _Copy(t._root);
+			_Destroy(_root);
+			root = newNode;
+		}
+	}*/
+
+	BinaryTree<T>& operator=(const BinaryTree<T> t)//ÏÖ´ú
+	{
+		swap(-root£¬t._root);
+		return *this;
+	}
+
 	BinaryTree(T* a, size_t n, const T& invalid = T())
 	{
 		size_t index = 0;
@@ -260,6 +286,27 @@ protected:
 			return ret;
 		return _Find(root->_right, x);
 	}
+
+	void _Destroy(Node* root)
+	{
+		if (root == NULL)
+			return;
+
+		_Destroy(root->_left);
+		_Destroy(root->_right);
+		delete root;
+	}
+
+	Node* _Copy(Node* root)
+	{
+		if (root == NULL)
+			return NULL;
+		Node* newNode = new Node(root->_data);
+		newNode->_left = _Copy(root->_left);
+		newNode->_right = _Copy(root->_right);
+
+		return newNode;
+	}
 protected:
 	Node*  _root;
 };
@@ -284,6 +331,11 @@ void TestBinaryTree()
 	cout << "Depth: " << t.Depth() << endl;
 	cout << " Find->3: " << t.Find(3)->_data << endl;
 	cout << " Find->0: " << t.Find(0) << endl;
+
+	BinaryTree<int> t1(t);
+	t1.PrevOrder();
+	BinaryTree<int> t2=t1;
+	t2.PrevOrder();
 }
 
 int main()
