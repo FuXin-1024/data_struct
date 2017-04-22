@@ -21,7 +21,23 @@ public:
 		}
 	}
 
-	
+	const T& Top() const
+	{
+		return _a[0];
+	}
+	void Push(const T& x)
+	{
+		_a.push_back(x);
+		_AdjustUp(_a.size() - 1);
+	}
+
+	void Pop()
+	{
+		assert(!_a.empty());
+		swap(_a[0], _a[_a.size() - 1]);
+		_a.pop_back();
+		_AdjustDown(0);
+	}
 protected:
 	//向下调整
 	void _AdjustDown(int root)//第一个非叶子节点
@@ -42,6 +58,23 @@ protected:
 				break;
 		}
 	}
+
+	//向上调整
+	void _AdjustUp(int child)
+	{
+		int parent = (child - 1) / 2;
+		while (child > 0)
+		{
+			if (_a[child] > _a[parent])
+			{
+				swap(_a[child], _a[parent]);
+				child = parent;
+				parent = (child - 1) / 2;
+			}
+			else
+				break;
+		}
+	}
 protected:
 	vector<T> _a;
 };
@@ -51,6 +84,9 @@ void HeapTest()
 	int a[] = { 10, 11, 13, 12, 16, 18, 15, 17, 14, 19 };
 	int n = sizeof(a) / sizeof(a[0]);
 	Heap<int> hp(a, n);
+	hp.Push(20);
+	hp.Pop();
+	cout<<hp.Top()<<endl;
 }
 int main()
 {
