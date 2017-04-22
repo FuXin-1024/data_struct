@@ -4,6 +4,23 @@
 using namespace std;
 
 template<class T>
+struct Less
+{
+	bool operator()(const T& l, const T& r)
+	{
+		return l < r;
+	}
+};
+
+template<class T>
+struct Greater
+{
+	bool operator()(const T& l, const T& r)
+	{
+		return l > r;
+	}
+};
+template<class T,class Compare=Less<T>>
 class Heap
 {
 public:
@@ -42,13 +59,14 @@ protected:
 	//向下调整
 	void _AdjustDown(int root)//第一个非叶子节点
 	{
+		Compare comFunc;
 		int parent = root;
 		int child = parent * 2 + 1;
 		while (child < _a.size())
 		{
-			if (child + 1 < _a.size() && _a[child] < _a[child + 1])
+			if (child + 1 < _a.size() && comFunc(_a[child+1] , _a[child ]))
 				++child;
-			if (_a[child] > _a[parent])
+			if (comFunc(_a[child] , _a[parent]))
 			{
 				swap(_a[child], _a[parent]);
 				parent = child;
@@ -62,10 +80,11 @@ protected:
 	//向上调整
 	void _AdjustUp(int child)
 	{
+		Compare comFunc;
 		int parent = (child - 1) / 2;
 		while (child > 0)
 		{
-			if (_a[child] > _a[parent])
+			if (comFunc(_a[child],_a[parent]))
 			{
 				swap(_a[child], _a[parent]);
 				child = parent;
