@@ -98,6 +98,100 @@ public:
 		return _FindR(_root, key);
 	}
 
+	bool Remove(const T& key)
+	{
+		Node* cur = _root;
+		Node* parent = cur;
+		while (cur)
+		{
+			if (cur->_key < key)
+			{
+				parent = cur;
+				cur = cur->_right;
+			}
+			else if (cur->_key>key)
+			{
+				parent = cur;
+				cur = cur->_left;
+			}
+			else
+			{
+				Node* del = cur;
+				//没有左子树
+				if (cur->_left == NULL)
+				{
+					//删除没有左子树的根节点
+					if (_root->_key == key)
+					{
+						_root = _root->_right;
+						delete del;
+						return true;
+					}
+					if (parent->_right == cur)
+					{
+						parent->_right = cur->_right;
+					}
+					else
+					{
+						parent->_left = cur->_right;
+					}
+				}
+				//没有右子树
+				else if (cur->_right==NULL)
+				{
+					//删除没有右子树的根节点
+					if (_root->_key == key)
+					{
+						_root = _root->_left;
+						delete del;
+						return true;
+					}
+					if (parent->_right == cur)
+					{
+						parent->_right = cur->_left;
+					}
+					else
+					{
+						parent->_left = cur->_left;
+					}
+				}
+				//既有左子树又有右子树
+				else
+				{
+					//替换
+					//左树的最右节点，右树的最左节点
+					Node* subRight = cur->_right;
+					Node* subParent = cur;//不能为空！
+					while (subRight->_left)
+					{
+						subParent = subRight;
+						subRight = subRight->_left;
+					}
+					// 右子树的最左节点，开始替换
+					cur->_key = subRight->_key;
+
+					del = subRight;
+					if (subParent->_left == subRight)
+					{
+						subParent->_left = subRight->_right;
+					}
+					else
+					{
+						subParent->_right = subRight->_right;
+					}
+				}
+				delete del;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool RemoveR(const T& key)
+	{
+		return _RemoveR(_root, key);
+	}
+
 protected:
 	bool _InsertR(Node*& root, const T& key)
 	{
@@ -147,6 +241,57 @@ protected:
 		else
 			return root;
 	}
+
+	bool _RemoveR(Node*& root, const T& key)
+	{
+		if (root == NULL)
+		{
+			return false;
+		}
+		if (root->_key < key)
+		{
+			return _RemoveR(root->_right, key);
+		}
+		else if (root->_key > key)
+		{
+			return _RemoveR(root->_left, key);
+		}
+		else
+		{
+			Node* del = root;
+			if (root->_left == NULL)
+			{
+				root = root->_right;
+			}
+			else if (root->_right == NULL)
+			{
+				root = root->_left;
+			}
+			else
+			{
+				Node* parent = root;
+				Node* subRight = root->_right;
+				while (subRight->_left)
+				{
+					parent = subRight;
+					subRight = subRight->_left;
+				}
+				swap(subRight->_key, parent->_key);
+				del = subRight;
+				if (parent->_left == subRight)
+				{
+					parent->_left = subRight->_right;
+				}
+				else
+				{
+					parent->_right = subRight->_right;
+				}
+			}
+			delete del;
+			return true;
+		}
+	}
+
 protected:
 	Node* _root;
 };
@@ -198,6 +343,10 @@ void Test()
 	cout << "Find-->8  " << s.FindR(8)->_key << endl;
 	cout << "Find-->9  " << s.FindR(9)->_key << endl;
 	cout << "Find-->10  " << s.FindR(10) << endl;*/
+	/*s.Remove(0);
+	s.Remove(5);*/
+	s.RemoveR(0);
+	s.InOrder();
 }
 int main()
 {
