@@ -76,6 +76,28 @@ public:
 		cout << endl;
 	}
 
+	const Node* Find(const T& key)
+	{
+		if (_root == NULL)
+			return NULL;
+		Node* cur = _root;
+		while (cur)
+		{
+			if (cur->_key < key)
+				cur = cur->_right;
+			else if (cur->_key>key)
+				cur = cur->_left;
+			else
+				return cur;
+		}
+		return NULL;
+	}
+
+	const Node* FindR(const T& key)
+	{
+		return _FindR(_root, key);
+	}
+
 protected:
 	bool _InsertR(Node*& root, const T& key)
 	{
@@ -114,6 +136,17 @@ protected:
 		delete root;
 	}
 
+	Node* _FindR(Node* root, const T& key)
+	{
+		if (root == NULL)
+			return NULL;
+		if (root->_key < key)
+			return _FindR(root->_right, key);
+		else if (root->_key>key)
+			return _FindR(root->_left, key);
+		else
+			return root;
+	}
 protected:
 	Node* _root;
 };
@@ -142,6 +175,29 @@ void Test()
 	s.InsertR(0);
 	s.InsertR(9);
 	s.InOrder();
+	/*cout << "Find-->0  " << s.Find(0)->_key << endl;
+	cout << "Find-->1  " << s.Find(1)->_key << endl;
+	cout << "Find-->2  " << s.Find(2)->_key << endl;
+	cout << "Find-->3  " << s.Find(3)->_key << endl;
+	cout << "Find-->4  " << s.Find(4)->_key << endl;
+	cout << "Find-->5  " << s.Find(5)->_key << endl;
+	cout << "Find-->6  " << s.Find(6)->_key << endl;
+	cout << "Find-->7  " << s.Find(7)->_key << endl;
+	cout << "Find-->8  " << s.Find(8)->_key << endl;
+	cout << "Find-->9  " << s.Find(9)->_key << endl;
+	cout << "Find-->10  " << s.Find(10) << endl;*/
+
+	/*cout << "Find-->0  " << s.FindR(0)->_key << endl;
+	cout << "Find-->1  " << s.FindR(1)->_key << endl;
+	cout << "Find-->2  " << s.FindR(2)->_key << endl;
+	cout << "Find-->3  " << s.FindR(3)->_key << endl;
+	cout << "Find-->4  " << s.FindR(4)->_key << endl;
+	cout << "Find-->5  " << s.FindR(5)->_key << endl;
+	cout << "Find-->6  " << s.FindR(6)->_key << endl;
+	cout << "Find-->7  " << s.FindR(7)->_key << endl;
+	cout << "Find-->8  " << s.FindR(8)->_key << endl;
+	cout << "Find-->9  " << s.FindR(9)->_key << endl;
+	cout << "Find-->10  " << s.FindR(10) << endl;*/
 }
 int main()
 {
