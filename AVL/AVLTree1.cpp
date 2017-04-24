@@ -107,11 +107,17 @@ public:
 						RotateR(parent);
 					else//_bf=1
 						//左右单旋
-						RotatelLR(parent);
+						RotateLR(parent);
 				}
 				break;
 			}
 		}
+	}
+
+	void InOrder()
+	{
+		_InOrder(_root);
+		cout << endl;
 	}
 protected:
 	void _Destroy(Node* root)
@@ -124,6 +130,136 @@ protected:
 		delete root;
 	}
 
+	void RotateL(Node* parent)//左单旋
+	{
+		Node* subR = parent->_right;
+		Node* subRL = subR->_left;
+
+		parent->_right = subRL;
+		if (subRL)
+			subRL->_parent = parent;
+		Node* ppHead = parent->_parent;
+		subR->_left = parent;
+		parent->_parent = subR;
+
+		if (ppHead == NULL)//根节点
+		{
+			_root = subR;
+			subR->_parent = NULL;
+		}
+		else//不是根节点
+		{
+			if (ppHead->_left == parent)
+			{
+				ppHead->_left = subR;
+				subR->_parent = ppHead;
+			}
+			else
+			{
+				ppHead->_right = subR;
+				subR->_parent = ppHead;
+			}
+		}
+		parent->_bf = subR->_bf = 0;
+	}
+
+	void RotateR(Node* parent)
+	{
+		Node* subL = parent->_left;
+		Node* subLR = subL->_right;
+
+		parent->_left = subLR;
+		if (subLR)
+			subLR->_parent = parent;
+		Node* ppHead = parent->_parent;
+		subL->_right = parent;
+		parent->_parent = subL;
+
+		if (ppHead == NULL)//根节点
+		{
+			_root = subL;
+			subL->_parent = NULL;
+		}
+		else//不是根节点
+		{
+			if (ppHead->_left == parent)
+			{
+				ppHead->_left = subL;
+				subL->_parent = ppHead;
+			}
+			else
+			{
+				ppHead->_right = subL;
+				subL->_parent = ppHead;
+			}
+		}
+		parent->_bf = subL->_bf = 0;
+	}
+
+	void RotateLR(Node* parent)//左右双旋
+	{
+		Node* subL = parent->_left;
+		Node* subLR = subL->_right;
+		int bf = subLR->_bf;
+
+		RotateL(parent->_left);
+		RotateR(parent);
+
+		//调整平衡因子
+		if (bf == 0)
+		{
+			parent->_bf = subL->_bf = subLR->_bf = 0;
+		}
+		else if (bf == -1)
+		{
+			parent->_bf = 1;
+			subL->_bf = 0;
+			subLR->_bf = 0;
+		}
+		else
+		{
+			parent->_bf = 0;
+			subL->_bf = -1;
+			subLR->_bf = 0;
+		}
+	}
+
+	void RotateRL(Node* parent)
+	{
+		Node* subR = parent->_right;
+		Node* subRL = subR->_left;
+		int bf = subRL->_bf;
+
+		RotateR(parent->_right);
+		RotateL(parent);
+
+		if (bf == 0)
+		{
+			parent->_bf = subR->_bf = subRL->_bf = 0;
+		}
+		else if (bf == -1)
+		{
+			parent->_bf = 0;
+			subR->_bf = 1;
+			subRL->_bf = 0;
+		}
+		else
+		{
+			parent->_bf = -1;
+			subR->_bf = 0;
+			subRL->_bf = 0;
+		}
+	}
+
+	void _InOrder(Node* root)
+	{
+		if (root == NULL)
+			return ;
+		_InOrder(root->_left);
+		cout << root->_key << " ";
+		_InOrder(root->_right);
+	}
+
 protected:
 	Node* _root;
 };
@@ -131,7 +267,22 @@ protected:
 
 void AVLTreeTest()
 {
-	AVLTree<int ,int> t;
+	AVLTree<int ,int> t1;
+	int a[] = { 16, 3, 7, 11, 9, 26, 18, 14, 15, 9, 3 };
+	for (size_t i = 0; i < sizeof(a) / sizeof(a[0]); ++i)
+	{
+		t1.Insert(a[i], i);
+	}
+	t1.InOrder();
+
+
+	AVLTree<int, int> t2;
+	int a1[] = { 4,2,6,1,3,5,15,7,16,14};
+	for (size_t i = 0; i < sizeof(a1) / sizeof(a1[0]); ++i)
+	{
+		t2.Insert(a1[i], i);
+	}
+	t2.InOrder();
 }
 int main()
 {
