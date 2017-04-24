@@ -119,6 +119,13 @@ public:
 		_InOrder(_root);
 		cout << endl;
 	}
+
+	bool IsBalance()
+	{
+		//return _IsBalance(_root);
+		int Height = 0;
+		return _IsBalance(_root, Height);
+	}
 protected:
 	void _Destroy(Node* root)
 	{
@@ -260,6 +267,56 @@ protected:
 		_InOrder(root->_right);
 	}
 
+	size_t _Height(Node* root)
+	{
+		if (root == NULL)
+			return 0;
+		int l = _Height(root->_left);
+		int r = _Height(root->_right);
+
+		return l > r ? l + 1 : r + 1;
+	}
+
+	bool _IsBalance(Node* root) //O(n)
+	{
+		if (root == NULL)
+			return true;
+		int l = _Height(root->_left);
+		int r = _Height(root->_right);
+
+		if ((r - l) != root->_bf)
+		{
+			cout << "平衡因子异常： " << root->_key << endl;
+			return false;
+		}
+
+		return (abs(r - l) < 2) && _IsBalance(root->_left) && _IsBalance(root->_right);
+	}
+
+	bool _IsBalance(Node* root, int& Height)
+	{
+		if (root == NULL)
+		{
+			Height = 0;
+			return true;
+		}
+		int l = 0; int r = 0;
+		if (_IsBalance(root->_left, l)
+			&& _IsBalance(root->_right, r)
+			&& abs(r - l) < 2)
+		{
+			if ((r - l) != root->_bf)
+			{
+				cout << "平衡因子异常： " << root->_key << endl;
+				return false;
+			}
+			Height = l>r ? l + 1 : r + 1;
+			return true;
+		}
+		else
+			return false;
+	}
+
 protected:
 	Node* _root;
 };
@@ -274,7 +331,7 @@ void AVLTreeTest()
 		t1.Insert(a[i], i);
 	}
 	t1.InOrder();
-
+	cout << "t1? ? ?:   " << t1.IsBalance() << endl;
 
 	AVLTree<int, int> t2;
 	int a1[] = { 4,2,6,1,3,5,15,7,16,14};
@@ -283,6 +340,7 @@ void AVLTreeTest()
 		t2.Insert(a1[i], i);
 	}
 	t2.InOrder();
+	cout << "t2? ? ?:   " << t1.IsBalance() << endl;
 }
 int main()
 {
