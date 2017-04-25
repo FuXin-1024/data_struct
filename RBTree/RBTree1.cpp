@@ -41,11 +41,12 @@ public:
 		_Destroy(_root);
 	}
 
-	bool Insert(const K& key)
+	bool Insert(const K& key,const V& value)
 	{
 		if (_root == NULL)
 		{
-			_root = new Node(key);
+			_root = new Node(key,value);
+			_root->_color = BLACK;
 			return true;
 		}
 		Node* parent = NULL;
@@ -67,7 +68,7 @@ public:
 				return false;
 			}
 		}
-		cur = new Node(key);
+		cur = new Node(key,value);
 		if (parent->_key < key)
 		{
 			parent->_right = cur;
@@ -83,7 +84,7 @@ public:
 		while (parent && parent->_color == RED)
 		{
 			Node* grandfather = parent->_parent;
-			if (parernt == grandfather->_left)
+			if (parent == grandfather->_left)
 			{
 				Node* uncle = grandfather->_right;
 				//1.叔叔存在且为红
@@ -125,14 +126,14 @@ public:
 				//叔叔不存在或存在为黑
 				else
 				{
-					//如果cur在parent的左边，先左旋，再右旋
+					//如果cur在parent的左边，先右旋，再左旋
 					//如果cur在parent的右边，左旋
-					if (cur = parent->_left)
+					if (cur == parent->_left)
 					{
-						RotateL(parent);
+						RotateR(parent);
 						swap(parent, cur);
 					}
-					RotateR(grandfather);
+					RotateL(grandfather);
 					parent->_color = BLACK;
 					grandfather->_color = RED;
 					break;
@@ -169,11 +170,89 @@ protected:
 		_InOrder(root->_right);
 	}
 
+	void RotateL(Node* parent)
+	{
+		Node* subR = parent->_right;
+		Node* subRL = subR->_left;
+
+		parent->_right = subRL;
+		if (subRL)
+			subRL->_parent = parent;
+
+		Node* ppHead = parent->_parent;
+		subR->_left = parent;
+		parent->_parent = subR;
+		if (ppHead == NULL)
+		{
+			_root = subR;
+			subR->_parent = NULL;
+		}
+		else
+		{
+			if (ppHead->_left == parent)
+			{
+				ppHead->_left = subR;
+				subR->_parent = ppHead;
+			}
+			else
+			{
+				ppHead->_right = subR;
+				subR->_parent = ppHead;
+			}
+		}
+	}
+
+	void RotateR(Node* parent)
+	{
+		Node* subL = parent->_left;
+		Node* subLR = subL->_right;
+		Node* ppHead = parent->_parent;
+		parent->_left = subLR;
+		if (subLR)
+			subLR->_parent = parent;
+
+		subL->_right = parent;
+		parent->_parent = subL;
+
+		if (ppHead == NULL)
+		{
+			_root = subL;
+			subL->_parent = NULL;
+		}
+		else
+		{
+			if (ppHead->_left == parent)
+			{
+				ppHead->_left = subL;
+				subL->_parent = ppHead;
+			}
+			else
+			{
+				ppHead->_right = subL;
+				subL->_parent = ppHead;
+			}
+		}
+	}
+
 protected:
 	Node* _root;
 };
+
+void TestRBTree()
+{
+	RBTree<int, int> t1;
+	int a[] = { 16, 3, 7, 11, 9, 26, 18, 14, 15, 9, 3 };
+	for (size_t i = 0; i < sizeof(a) / sizeof(a[0]); ++i)
+	{
+		t1.Insert(a[i], i);
+		//cout << a[i] << " ";
+	}
+	t1.InOrder();
+	//cout << t1.IsBlance() << endl;
+}
 int main()
 {
+	TestRBTree();
 	system("pause");
 	return 0;
 }
