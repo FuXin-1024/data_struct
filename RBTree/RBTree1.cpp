@@ -150,6 +150,23 @@ public:
 		cout << endl;
 	}
 
+	bool IsBalance()
+	{
+		if (_root == NULL)
+			return true;
+		if (_root->_color == RED)
+			return false;
+		int blackNum = 0;
+		Node* left = _root;
+		while (left)
+		{
+			if (left->_color == BLACK)
+				++blackNum;
+			left = left->_left;
+		}
+		int num = 0;
+		return _IsBalance(_root, blackNum, num);
+	}
 
 protected:
 	void _Destroy(Node* root)
@@ -234,6 +251,29 @@ protected:
 		}
 	}
 
+	bool _IsBalance(Node* root, const int blackNum, int num)
+	{
+		if (root == NULL)
+		{
+			if (num != blackNum)
+			{
+				cout << "异常" << endl;
+				return false;
+			}
+			else
+				return true;
+		}
+		if (root->_color == RED && root->_parent->_color == RED)
+		{
+			cout << "存在连续红节点" << root->_key << endl;
+		}
+		if (root->_color == BLACK)
+		{
+			++num;
+		}
+		return _IsBalance(root->_left, blackNum, num) && _IsBalance(root->_right, blackNum, num);
+	}
+
 protected:
 	Node* _root;
 };
@@ -248,7 +288,7 @@ void TestRBTree()
 		//cout << a[i] << " ";
 	}
 	t1.InOrder();
-	//cout << t1.IsBlance() << endl;
+	cout << t1.IsBalance() << endl;
 }
 int main()
 {
