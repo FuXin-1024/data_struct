@@ -124,7 +124,7 @@ public:
 		_bs.Set(hash5 % _range);
 	}
 
-	bool Test()
+	bool Test(const K& key)
 	{
 		size_t hash1 = HashFunc1()(key);
 		if (_bs.Test(hash1 % _range == false))
