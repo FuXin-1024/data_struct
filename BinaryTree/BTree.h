@@ -82,17 +82,23 @@ public:
 			{
 				newNode->_keys[index] = cur->_keys[i];
 				newNode->_subs[index] = cur->_subs[i];
-				if (cur->_subs[i])
-				{
-					cur->_subs[i]->_parent = newNode;
-				}
 				++index;
 				newNode->_size++;
+
+				if (cur->_subs[i])
+				{
+					Node *sb = cur->_subs[i];
+					cur->_subs[i] = NULL;
+					sb->_parent = newNode;
+
+				}
 			}
-			newNode->_subs[i] = cur->_subs[i];//最后一个元素
+			newNode->_subs[index] = cur->_subs[i];//最后一个元素
 			if (cur->_subs[i])
 			{
-				cur->_subs[i]->_parent = newNode;
+				Node *sb = cur->_subs[i];
+				cur->_subs[i] = NULL;
+				sb->_parent = newNode;
 			}
 			cur->_size = (cur->_size) - (newNode->_size )- 1;
 
@@ -104,7 +110,7 @@ public:
 				cur->_parent = _root;
 				_root->_subs[1] = newNode;
 				newNode->_parent = _root;
-				_root->_size = 1;
+				_root->_size++;
 				return true;
 			}
 			else
