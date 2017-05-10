@@ -5,11 +5,15 @@ using namespace std;
 void AdjustUp(int* a, int i, int n)//从第一个非叶子结点开始调整
 {
 	assert(a);
-	int j = 2 * i + 1;
+	int j = (i - 1) / 2;
 	int tmp = a[i];
 	
-	while (j < n)
+	while (j >= 0 && i != 0)
 	{
+		if (a[j] <= tmp)
+			break;
+		a[i] = a[j];
+		i = j;
 
 	}
 }
