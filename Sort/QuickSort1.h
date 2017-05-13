@@ -3,7 +3,7 @@
 #include<assert.h>
 using namespace std;
 
-//左右指针法
+
 int GetMidindex(int* a, int left, int right)
 {
 	int mid = left + (right - left) / 2;
@@ -26,7 +26,9 @@ int GetMidindex(int* a, int left, int right)
 			return left;
 	}
 }
-int PartSort(int* a, int left, int right)
+
+//左右指针法
+int PartSort1(int* a, int left, int right)
 {
 	assert(a);
 	int mid = GetMidindex(a, left, right);//三数取中
@@ -53,12 +55,34 @@ int PartSort(int* a, int left, int right)
 	return begin;
 }
 
+//挖坑法
+int PartSort2(int* a, int left, int right)
+{
+	assert(a);
+	int key = a[right];//坑
+	while (left < right)
+	{
+		while (left < right && a[left] <= key)
+		{
+			++left;
+		}
+		a[right] = a[left];
+		while (left < right && a[right] >= key)
+		{
+			--right;
+		}
+		a[left] = a[right];
+	}
+	a[left] = key;
+	return left;
+}
+
 void QuickSort(int* a, int left,int right)
 {
 	assert(a);
 	if (left >= right)
 		return;
-	int div = PartSort(a, left, right);
+	int div = PartSort2(a, left, right);
 
 	QuickSort(a, left, div - 1);
 	QuickSort(a, div + 1,right);
