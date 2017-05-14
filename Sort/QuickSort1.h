@@ -77,12 +77,33 @@ int PartSort2(int* a, int left, int right)
 	return left;
 }
 
+//前后指针法
+int PartSort3(int* a, int left, int right)
+{
+	assert(a);
+	int mid = GetMidindex(a, left, right);//三数取中
+	swap(a[mid], a[right]);
+
+	int cur = left;
+	int prev = left - 1;
+	int key = a[right];
+	while (cur < right)
+	{
+		if (a[cur] < key && ++prev != cur)
+			swap(a[cur], a[prev]);
+		++cur;
+	}
+	swap(a[++prev], a[right]);
+	return prev;
+}
+
 void QuickSort(int* a, int left,int right)
 {
 	assert(a);
 	if (left >= right)
 		return;
-	int div = PartSort2(a, left, right);
+	//int div = PartSort2(a, left, right);
+	int div = PartSort3(a, left, right);
 
 	QuickSort(a, left, div - 1);
 	QuickSort(a, div + 1,right);
