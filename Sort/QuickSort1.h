@@ -45,7 +45,7 @@ int PartSort1(int* a, int left, int right)
 			++begin;
 		}
 
-		while (begin<end && a[end]>key)//еваЁ
+		while (begin<end && a[end]>=key)//еваЁ
 		{
 			--end;
 		}
