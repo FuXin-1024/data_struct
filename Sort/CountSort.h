@@ -1,9 +1,10 @@
 #pragma once 
 #include<iostream>
+using namespace std;
 #include<assert.h>
 #include<memory.h>
 #include<string.h>
-using namespace std;
+
 void CountSort(int* a, int n)
 {
 	assert(a);
@@ -19,7 +20,7 @@ void CountSort(int* a, int n)
 	}
 	int range = max - min + 1;
 	int* counts = new int(range);
-	memset(counts, 0, sizeof(range));
+	memset(counts, 0, sizeof(int)*range);
 
 	for (int i = 0; i < n; ++i)
 	{
