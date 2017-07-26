@@ -3,6 +3,9 @@
 #include<string>
 using namespace std;
 
+const long long MAX = 0x7fffffffffffffff;
+const long long MIN = 0x8000000000000000;
+
 class BigData
 {
 public:
@@ -34,7 +37,7 @@ public:
 			return;
 		
 		//000000000000123456789
-		while (0 == *data)
+		while ('0' == *data)
 			++data;
 		//直接转换
 		_strData.resize(strlen(data) + 1);
@@ -50,6 +53,24 @@ public:
 			_value = 0 - _value;
 		_strData.resize(count);		
 	}
+	string GetStrData()
+	{
+		return _strData;
+	}
+
+	BigData operator+(const BigData& b)
+	{
+		//先判断是否超出范围，若没有则直接用四则运算来做，超出用字符转来运算
+		if (IsINT64OverFlow() || b.IsINT64OverFlow())
+		{
+			//同号处理
+			if (_strData[0] == b._strData[0])
+				return BigData(StrAdd(_strData, b._strData));
+			//else //异号
+			//	return BigData(StrSub(_strData, b._strData));
+		}
+	}
+
 	friend ostream& operator<<(ostream& _cout, const BigData& b)
 	{
 		char* data = (char *)b._strData.c_str();
@@ -58,7 +79,61 @@ public:
 		_cout << data;
 		return _cout;
 	}
+protected:
+	bool IsINT64OverFlow()const //判断是否溢出
+	{
+		//BigData tmp("+9223372036854775807");
+		//if ('-' == _strData[0])
+		//{
+		//	tmp._strData = "-9223372036854775808";
+		//}
+		////判断长度
+		//if (_strData.size() > tmp._strData.size())
+		//	return true;
+		//else if (_strData.size() == tmp._strData.size()) //长度相同，比较数值大小是否超出
+		//{
+		//	if (_strData > tmp._strData)
+		//		return true;
+		//}
+		//return false;
+		return true;
+	}
+
+	string StrAdd(string left, string right)
+	{
+		int Lleft = left.size();
+		int Lright = right.size();
+		//把长度长的作为左操作数
+		if (Lleft < Lright)
+		{
+			left.swap(right);
+			swap(Lleft, Lright);
+		}
+
+		//进行计算
+		string strRes;
+		strRes.resize(Lleft + 1); //考虑进位情况，可能进1位
+		strRes[0] = left[0];//同号相加，符号位一定相同。
+		char step = 0;		//进位
+
+		for (int idx = 1; idx < Lleft; idx++)
+		{
+			char cRes = left[Lleft - idx] + step - '0';
+			if (idx < Lright)
+				cRes = cRes + (right[Lright - idx] - '0');
+			step = 0;
+			while (cRes >= 10) //逢十进位
+			{
+				step = 1;
+				cRes -= 10;
+			}
+			strRes[Lleft - idx + 1] = cRes + '0';
+		}
+		//加上最后一次的进位
+		strRes[1] = step + '0';
+		return strRes;
+	}
 private:
-	string _strData;
-	long long _value;
+	string _strData;//大数运算的数据
+	long long _value;//没有超出范围的数
 };
