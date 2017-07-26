@@ -216,6 +216,62 @@ public:
 			/*return BigData(StrMul(_strData, b._strData));*/
 	}
 
+	BigData operator/(const BigData& b)
+	{
+		if (b._strData == "+0")
+		{
+			cout << "除零错误\n" << endl;
+			system("pause");
+			exit(1);
+		}
+
+		//没有溢出情况下
+		if (!IsINT64OverFlow() && !b.IsINT64OverFlow())
+			return BigData(_value / b._value);
+		
+		//处理特殊情况，分子的绝对值比分母的绝对值小-->0, 0除，除正负1
+		if (_strData == "+0")
+			return BigData(0);
+		if (b._strData == "+1")
+			return BigData(_strData);
+		if (b._strData == "-1")
+		{
+			string tmp(_strData);
+			if (_strData[0] != b._strData[0])  //异号
+				tmp[0] = '-';
+			else
+				tmp[0] = '+';
+
+			return BigData(tmp);
+		}
+		//处理异常情况下的除操作
+		int Lsize = _strData.size();
+		int Rsize = b._strData.size();
+		if (Lsize < Rsize)
+			return BigData(0);
+		else if (Lsize == Rsize)
+		{
+			if (_strData.compare(b._strData) == 0)
+				return BigData(1);
+			else
+			{
+				string left = _strData;
+				string right = b._strData;
+				if (_strData[0] != b._strData[0])  //将符号统一，进行比较
+				{
+					left[0] = '+';
+					right[0] = '+';
+				}
+
+				if (left.compare(right) < 0)    //分子绝对值小于分母绝对值的情况
+					return BigData(0);
+			}
+		}
+		else
+			return BigData(StrDiv(_strData, b._strData));
+
+	}
+
 	friend ostream& operator<<(ostream& _cout, const BigData& b)
 	{
 		char* data = (char *)b._strData.c_str();
@@ -246,8 +302,8 @@ protected:
 
 	bool IsLeftBig(string left, string right) //左操作数 >=右操作数，返回true
 	{
-		if (left[0] == '-'&& right[0] == '+')
-			return false;
+		/*if (left[0] == '-'&& right[0] == '+')
+			return false;*/
 		int Lsize = left.size();
 		int Rsize = right.size();
 
@@ -402,6 +458,55 @@ protected:
 			strRes[Lleft - idx + 1] = (num)+(strRes[Lleft - idx + 1] - '0') + '0';
 			strRes[Lleft - idx] = step + '0';
 		}
+		return strRes;
+	}
+
+	string StrDiv(string left, string right)
+	{
+		int Lleft = left.size();
+		int Lright = right.size();
+
+		string strRes;
+		strRes.resize(Lleft);
+		char symbol = '+';
+		if (left[0] != right[0])//异号相除准为负
+			symbol = '-';
+
+		//符号统一
+		left[0] = '+';
+		right[0] = '+';
+
+		int ret = 1;
+		int idx = 1;
+		string Ldata("+");
+		for (; idx < Lleft; idx++)
+		{
+			Ldata.push_back(left[idx]);//将字符添加进去
+			if (!IsLeftBig(Ldata, right))
+			{
+				strRes[ret++] = '0';
+				continue;
+			}
+			int count = 0;
+			while (1)
+			{
+				if (!IsLeftBig(Ldata, right))  //左操作数小
+				{
+					break;
+				}
+				count++;
+				Ldata = StrSub(Ldata, right);  //此处一定是左操作数大,才进行计算
+				Ldata = BigData(Ldata)._strData; //处理掉前面的零 "+096" -->"+96"
+			}
+			//走到这，确定了商的一位;
+			strRes[ret++] = count + '0';
+			//重置Ldata,准备下一次的计算
+			//Ldata = BigData(Ldata)._strData;
+			if (Ldata == "+0")  //处理掉，余数是零的情况，"+0" -->"+"  达到重置Ldata 的作用;
+				Ldata.resize(1);
+		}
+		//符号处理;
+		strRes[0] = symbol;
 		return strRes;
 	}
 private:
