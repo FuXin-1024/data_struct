@@ -302,8 +302,8 @@ protected:
 
 	bool IsLeftBig(string left, string right) //左操作数 >=右操作数，返回true
 	{
-		/*if (left[0] == '-'&& right[0] == '+')
-			return false;*/
+		if (left[0] == '-'&& right[0] == '+')
+			return false;
 		int Lsize = left.size();
 		int Rsize = right.size();
 
@@ -355,10 +355,13 @@ protected:
 
 	string StrSub(string left, string right)
 	{
+		char symbol = '+';
+		if (!IsLeftBig(left, right))
+			symbol = '-';
 		int Lleft = left.size();
 		int Lright = right.size();
 		//把大的字符串当左字符串
-		if (Lleft <= Lright)
+		if (Lleft <= Lright && !IsLeftBig(left,right))
 		{
 			left.swap(right);
 			swap(Lleft, Lright);
@@ -384,6 +387,7 @@ protected:
 					break;
 			}
 		}
+		left[0] = symbol;
 		return left;
 	}
 
@@ -509,6 +513,7 @@ protected:
 		strRes[0] = symbol;
 		return strRes;
 	}
+
 private:
 	string _strData;//大数运算的数据
 	long long _value;//没有超出范围的数
