@@ -94,6 +94,21 @@ public:
 		}
 	}
 
+	BigData operator-(const BigData& b)
+	{
+		if (IsINT64OverFlow() || b.IsINT64OverFlow())//至少有一个超出范围
+		{
+			if (_strData[0] == b._strData[0])
+			{
+				return BigData(StrSub(_strData, b._strData));
+			}
+			else
+			{
+				return BigData(StrAdd(_strData, b._strData));
+			}
+		}
+	}
+
 	friend ostream& operator<<(ostream& _cout, const BigData& b)
 	{
 		char* data = (char *)b._strData.c_str();
