@@ -66,8 +66,8 @@ public:
 			//同号处理
 			if (_strData[0] == b._strData[0])
 				return BigData(StrAdd(_strData, b._strData));
-			//else //异号
-			//	return BigData(StrSub(_strData, b._strData));
+			else //异号
+				return BigData(StrSub(_strData, b._strData));
 		}
 	}
 
@@ -99,7 +99,25 @@ protected:
 		return true;
 	}
 
-	string StrAdd(string left, string right)
+	bool IsLeftBig(string left, string right) //左操作数 >=右操作数，返回true
+	{
+		if (left[0] == '-'&& right[0] == '+')
+			return false;
+		int Lsize = left.size();
+		int Rsize = right.size();
+
+		if (Lsize > Rsize)
+			return true;
+		else if (Lsize == Rsize)
+		{
+			if (left.compare(right) < 0)
+				return false;
+			else
+				return true;
+		}
+		return false;
+	}
+	string StrAdd(string left, string right)//同号字符串相加
 	{
 		int Lleft = left.size();
 		int Lright = right.size();
@@ -132,6 +150,40 @@ protected:
 		//加上最后一次的进位
 		strRes[1] = step + '0';
 		return strRes;
+	}
+
+	string StrSub(string left, string right)//字符串同号相减，异号相加
+	{
+		int Lleft = left.size();
+		int Lright = right.size();
+		//把大的字符串当左字符串
+		if (!IsLeftBig(left,right))
+		{
+			left.swap(right);
+			swap(Lleft, Lright);
+		}
+		//进行计算
+		char ret = 0;//保存相减的结果
+		for (int idx = 1; idx < Lleft; idx++)
+		{
+			char leftData = left[Lleft - idx] - '0';
+			char rightData = right[Lright - idx] - '0';
+			char src = left[Lleft - idx - 1];
+			if (idx < Lright && leftData < rightData)//需要结尾 
+			{
+				left[Lleft - idx - 1] = src - 1;
+				ret = leftData + 10 - rightData + '0';
+				left[Lleft - idx] = ret;
+			}
+			else
+			{
+				if (idx < Lright)
+					left[Lleft - idx] = leftData - rightData + '0';
+				else
+					break;
+			}
+		}
+		return left;
 	}
 private:
 	string _strData;//大数运算的数据
