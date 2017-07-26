@@ -69,6 +69,29 @@ public:
 			else //异号
 				return BigData(StrSub(_strData, b._strData));
 		}
+		else//没有超出
+		{	//同号
+			if (_strData[0] == b._strData[0])//同号相加可能溢出
+			{
+				//MAX-左操作数 > 右操作数--->不会溢出
+				if ((_strData[0] == '+' && MAX - _value > b._value) ||
+					(_strData[0] == '-'&&MAX - _value < b._value))
+				{
+					//此时不会溢出
+					return BigData(_value + b._value);
+				}
+				else
+				{
+					//相加后肯定不会溢出
+					return StrAdd(_strData, b._strData);
+				}
+			}
+			else
+			{
+				//异号，相加肯定不会溢出
+				return BigData(_value + b._value);
+			}
+		}
 	}
 
 	friend ostream& operator<<(ostream& _cout, const BigData& b)
@@ -152,12 +175,12 @@ protected:
 		return strRes;
 	}
 
-	string StrSub(string left, string right)//字符串同号相减，异号相加
+	string StrSub(string left, string right)
 	{
 		int Lleft = left.size();
 		int Lright = right.size();
 		//把大的字符串当左字符串
-		if (!IsLeftBig(left,right))
+		if (Lleft <= Lright)
 		{
 			left.swap(right);
 			swap(Lleft, Lright);
