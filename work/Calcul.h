@@ -209,16 +209,6 @@ string GetString()
 	return str;
 }
 
-void Usage()    //表达式输入规则
-{
-	printf("Usage:\n");
-	printf("##########################################\n");
-	printf("example:1+2-3*4+5/6+(-1*2)\n");
-	printf("Usage:1+2-3*4+5/6((0-1)*2)\n");
-	printf("使用负数时-3，其格式为(0-3)作为负数的输入\n");
-	printf("##########################################\n");
-}
-
 bool IsRightStr(const string &s)   //输入表达式正确返回true
 {
 	char *err1 = "(-";
@@ -229,13 +219,35 @@ bool IsRightStr(const string &s)   //输入表达式正确返回true
 	return false;
 }
 
-void Test()
-{
-	queue<string> q;
-	printf("请输入表达式：");
 
+void Usage()    //表达式输入规则
+{
+	cout << "Usage:"<<endl;
+	cout << "###############################################################" << endl;
+	cout << "example:1+2-3*4+5/6+(-1*2)" << endl;
+	cout << "Usage:1+2-3*4+5/6((0-1)*2)" << endl;
+	cout << "使用负数时-1，其格式为(0-1)作为负数的输入" << endl;;
+	cout << "###############################################################" << endl;
+	cout << endl;
+}
+
+void CalMenu()
+{
+	cout << "###############################################################"<< endl;
+	cout << "####################   ---欢迎使用计算器---     ###############"<< endl;
+	cout << "####################    1.开始计算              ###############"<< endl;
+	cout << "####################    2.使用方法              ###############"<< endl;
+	cout << "####################    0.退出                  ###############"<< endl;
+	cout << "###############################################################" << endl;
+}
+void Calcul()
+{
+	cin.sync();
+	queue<string> q;
+	cout << "请输入计算表达式：" ;
 
 	string str = GetString();
+
 	//cout << str << " = ";
 	if (IsRightStr(str))
 	{
@@ -250,8 +262,29 @@ void Test()
 		printf("您的输入格式有误，请重新输入\n");
 		Usage();
 	}
-
-
+}
+void CalTest()
+{
+	while (1)
+	{
+		CalMenu();
+		int num = 0;
+		cout << "请选择：";
+		cin >> num;
+		switch (num)
+		{
+		case 1:
+			Calcul();
+			break;
+		case 2:
+			Usage();
+			break;
+		case 0:
+			return;
+		default:
+			cout << "输入错误！请重新输入！" << endl;
+		}
+	}
 }
 
 
