@@ -67,9 +67,16 @@ public:
 	{
 		_day = _day + day;
 
-		while (IsIllsral(_year, _month, _day))//如果日期不合法，自动转化为合法
+		while (_day > days_month(_year, _month))
 		{
-			ChangeDate();
+			_day = _day - days_month(_year, _month);
+			_month += 1;
+
+			if (_month > 12)
+			{
+				_year += 1;
+				_month = 1;
+			}
 		}
 		return *this;
 	}
@@ -77,9 +84,15 @@ public:
 	Date& operator++(int)
 	{
 		++_day;
-		while (IsIllsral(_year, _month, _day))//如果日期不合法，自动转化为合法
+		if (_day > days_month(_year, _month))
 		{
-			ChangeDate();
+			_day = _day - days_month(_year, _month);
+			_month += 1;
+			if (_month > 12)
+			{
+				_year += 1;
+				_month -= 12;
+			}
 		}
 		return *this;
 	}
@@ -87,9 +100,16 @@ public:
 	Date& operator++()
 	{
 		++_day;
-		while (IsIllsral(_year, _month, _day))//如果日期不合法，自动转化为合法
+		if (_day > days_month(_year, _month))
 		{
-			ChangeDate();
+
+			_day = _day - days_month(_year, _month);
+			_month += 1;
+			if (_month > 12)
+			{
+				_year += 1;
+				_month -= 12;
+			}
 		}
 		return *this;
 	}
@@ -98,9 +118,15 @@ public:
 	{
 		_day = _day - day;
 
-		while (IsIllsral(_year, _month, _day))//如果日期不合法，自动转化为合法
+		while (_day <= 0)
 		{
-			ChangeDate();
+			_month -= 1;
+			_day += days_month(_year, _month);
+			if (_month <= 0)
+			{
+				_year -= 1;
+				_month = 12;
+			}
 		}
 		return *this;
 	}
@@ -128,9 +154,15 @@ public:
 	Date& operator--()
 	{
 		_day--;
-		while (IsIllsral(_year, _month, _day))//如果日期不合法，自动转化为合法
+		if (_day == 0)
 		{
-			ChangeDate();
+			_day = days_month(_year, _month);
+			_month -= 1;
+			if (_month == 0)
+			{
+				_year -= 1;
+				_month = 12;
+			}
 		}
 		return *this;
 	}
@@ -138,9 +170,15 @@ public:
 	Date& operator--(int)
 	{
 		_day--;
-		while (IsIllsral(_year, _month, _day))//如果日期不合法，自动转化为合法
+		if (_day == 0)
 		{
-			ChangeDate();
+			_day = days_month(_year, _month);
+			_month -= 1;
+			if (_month == 0)
+			{
+				_year -= 1;
+				_month = 12;
+			}
 		}
 		return *this;
 	}
@@ -285,8 +323,8 @@ protected:
 	bool IsIllsral(int year,int month,int day) //违法返回真
 	{
 		if ((year<0) ||
-			(month<0 || month>12) ||
-			(day<0 || day>days_month(year, month)))
+			(month<=0 || month>12) ||
+			(day<=0 || day>days_month(year, month)))
 		{
 			return true;
 		}
@@ -304,21 +342,26 @@ protected:
 			_year += 1;
 		}
 
-		while (_month <= 0)
+		while (_month <=0)
 		{
 			_month += 12;
 			_year -= 1;
 		}
-
+		
 		while (_day > days_month(_year, _month))
 		{
 			_day = _day - days_month(_year, _month);
 			_month += 1;
 		}
 
-		while (_day <= 0)
+		while (_day <0)
 		{
 			_day = days_month(_year, _month - 1) + _day + 1;
+			_month -= 1;
+		}
+		while (_day =0)
+		{
+			_day = days_month(_year, _month - 1) + _day;
 			_month -= 1;
 		}
 	}
@@ -373,21 +416,22 @@ protected:
 };
 
 
-void menu()
+void DateMenu()
 {
-	cout << "####  ---请输入想进行的运算的序号---  ####" << endl;
-	cout << "#### 1.打印目标月份日历（格式：年 月）####" << endl;
-	cout << "#### 2.相隔天数计算  #####################" << endl;
-	cout << "#### 3.日期推算(填负数向前推进) ##########" << endl;
-	cout << "#### 0.退出###############################" << endl;
+	cout << "################   ---请输入想进行的运算的序号---  ############ " << endl;
+	cout << "################  1.打印目标月份日历（格式：年 月）############" << endl;
+	cout << "################  2.相隔天数计算                   ############ " << endl;
+	cout << "################  3.日期推算(填负数向前推进)       ############" << endl;
+	cout << "################  0.退出                           ############ " << endl;
 
 }
 void DateTest()
 {
-	menu();
+	DateMenu();
 	while (1)
 	{
 		int num = 0;
+		cout << "请选择：";
 		cin >> num;
 
 		switch (num)
@@ -437,7 +481,7 @@ void DateTest()
 				  {
 					  d2 = d1 - (-n);
 				  }
-				  cout << d2;
+				  cout << d2 << endl;
 				  break;
 		}
 		case 0:
