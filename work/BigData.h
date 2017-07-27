@@ -1,8 +1,8 @@
 #pragma once
 #pragma warning(disable:4996)
-
 #include<iostream>
 #include<string>
+#include<stdio.h>
 using namespace std;
 
 typedef long long INT64;    //long long 8字节
@@ -23,7 +23,8 @@ public:
 		:_value(num)
 	{
 		char val[30];
-		sprintf(val, "%d", num);
+		/*sprintf(val,"%d", num);*/
+		_i64toa(num, val, 10);
 		_strData = string(val);
 	}
 	BigData(const string& strData)
@@ -154,7 +155,11 @@ public:
 		{
 			//同号相减一定不会溢出
 			if (_strData[0] == b._strData[0])
-				return BigData(_value - b._value);
+			{
+				long long ret = _value - b._value;
+				return BigData(ret);
+			}
+				
 			else
 			{
 				//MAX - | 左操作数 | >|右操作数|
@@ -298,7 +303,7 @@ protected:
 				return true;
 		}
 		return false;
-		/*return true;*/
+		//return true;
 	}
 
 	bool IsLeftBig(string left, string right) //左操作数 >=右操作数，返回true
