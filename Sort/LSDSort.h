@@ -3,8 +3,8 @@
 #include<iostream>  
 using namespace std;
 
-//MSD：由高位到个位，排低位时要排上一个位相同的元素（否则会影响上一个位的排序结果）  
-//LSD：由个位到高位 
+//MSD：由高位到低位，排低位时要排上一个位相同的元素（否则会影响上一个位的排序结果）  
+//LSD：由低位到高位 
 
 size_t GetMaxDigit(size_t *arr, size_t len)
 {
