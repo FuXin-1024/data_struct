@@ -5,13 +5,13 @@ using namespace std;
 class UnionFindSet
 {
 public:
-	//¹¹Ôìº¯Êı£¬³õÊ¼»¯Îª-1
+	//æ„é€ å‡½æ•°ï¼Œåˆå§‹åŒ–ä¸º-1
 	UnionFindSet(size_t n)
 	{
 		v.resize(n + 1, -1);
 	}
 
-	//ÕÒµ½¸ù½Úµã
+	//æ‰¾åˆ°æ ¹èŠ‚ç‚¹
 	size_t FindRoot(size_t x)
 	{
 		size_t ret = x;
@@ -21,13 +21,13 @@ public:
 		return ret;
 	}
 
-	//ºÏ²¢
+	//åˆå¹¶
 	void Union(size_t x1, size_t x2)
 	{
 		size_t root1 = FindRoot(x1);
 		size_t root2 = FindRoot(x2);
 
-		//Í¬¸ù£¬ÒÑ¾­ÔÚÒ»¸ö¼¯ºÏ
+		//åŒæ ¹ï¼Œå·²ç»åœ¨ä¸€ä¸ªé›†åˆ
 		if (root1 == root2)
 			return;
 
@@ -35,13 +35,13 @@ public:
 		v[root2] = root1;
 	}
 
-	//ÅĞ¶ÏÊÇ·ñÔÚÒ»¸ö¼¯ºÏ  
+	//åˆ¤æ–­æ˜¯å¦åœ¨ä¸€ä¸ªé›†åˆ  
 	bool IsInSet(int x1, int x2)
 	{
 		return FindRoot(x1) == FindRoot(x2);
 	}
 
-	//Çó¼¯ºÏ(ÅóÓÑÈ¦)µÄ¸öÊı  
+	//æ±‚é›†åˆ(æœ‹å‹åœˆ)çš„ä¸ªæ•°  
 	size_t SetSize()
 	{
 		size_t count = 0;
@@ -59,16 +59,16 @@ private:
 
 void TestUnionFindSet()
 {
-	//Îå¸öÈË£¬ËÄ¸öÈËÓĞÅóÓÑÈ¦¹ØÏµ  
+	//äº”ä¸ªäººï¼Œå››ä¸ªäººæœ‰æœ‹å‹åœˆå…³ç³»  
 	const int n = 5;
-	const int m = 3;
+	const int m = 4;
 
 	UnionFindSet ufs(n);
-	int r[m][2] = { { 1, 2 }, { 2, 3 }, { 4, 5 } };
+	int r[m][2] = { { 1, 2 }, { 2, 3 }, { 4, 5 }, { 2, 4 } };
 	for (size_t i = 0; i < m; ++i)
 	{
 		ufs.Union(r[i][0], r[i][1]);
 	}
 
-	cout << "ÅóÓÑÈ¦µÄ¸öÊıÎª:" << ufs.SetSize() << endl;
+	cout << "æœ‹å‹åœˆçš„ä¸ªæ•°ä¸º:" << ufs.SetSize() << endl;
 }
